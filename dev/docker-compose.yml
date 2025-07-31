@@ -1,0 +1,25 @@
+name: voteflix-dev
+services:
+  api:
+    build:
+      context: ../services/api
+      dockerfile: dev/Dockerfile
+    develop:
+      watch:
+        - action: sync
+          path: ../services/api/main.go
+          target: /app/main.go
+        - action: sync
+          path: ../services/api/src
+          target: /app/src
+    environment:
+      - API_JWT_SECRET=${API_JWT_SECRET}
+      - API_PORT=${API_PORT}
+  proxy:
+    image: nginx
+    depends_on:
+      - api
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "3000:3000"
