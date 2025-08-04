@@ -1,0 +1,17 @@
+{
+  "formatters": {
+    "enable": [
+      "gofmt"
+    ]
+  },
+  "linters": {
+    "enable": [
+      "errcheck",
+      "govet",
+      "ineffassign",
+      "staticcheck",
+      "unused"
+    ]
+  },
+  "version": "2"
+}
