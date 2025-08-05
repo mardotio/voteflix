@@ -1,20 +1,50 @@
 name: voteflix-dev
 services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
   api:
     build:
       context: ../services/api
-      dockerfile: dev/Dockerfile
+      dockerfile: dev/voteflix/Dockerfile
+    depends_on:
+      - db
     develop:
       watch:
         - action: sync
-          path: ../services/api/main.go
-          target: /app/main.go
+          path: ../services/api/cmd
+          target: /app/cmd
         - action: sync
-          path: ../services/api/src
-          target: /app/src
+          path: ../services/api/internal
+          target: /app/internal
     environment:
-      - API_JWT_SECRET=${API_JWT_SECRET}
-      - API_PORT=${API_PORT}
+      - API_JWT_SECRET
+      - API_PORT
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+  migrations:
+    build:
+      context: ../services/api
+      dockerfile: dev/voteflix-migrations/Dockerfile
+    depends_on:
+      - db
+    environment:
+      - API_JWT_SECRET
+      - API_PORT
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_HOST
   proxy:
     image: nginx
     depends_on:
