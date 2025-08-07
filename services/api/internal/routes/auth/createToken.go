@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"voteflix/api/src/utils"
+	"voteflix/api/internal/utils"
 )
 
 type jsonEpochTime time.Time
@@ -24,9 +24,9 @@ func (rd createTokenResponse) Render(w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 
-func CreateToken(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateToken(w http.ResponseWriter, r *http.Request) {
 	claims := utils.JwtClaims{Sub: "user-id"}
-	token, tokenString, _ := utils.GetTokenAuth().Encode(claims.ToClaimsMap(time.Hour * 1))
+	token, tokenString, _ := h.app.JwtAuth().Encode(claims.ToClaimsMap(time.Hour * 1))
 
 	render.Status(r, http.StatusOK)
 	err := render.Render(w, r, createTokenResponse{Token: tokenString, Expires: jsonEpochTime(token.Expiration())})

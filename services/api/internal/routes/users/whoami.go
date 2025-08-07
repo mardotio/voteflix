@@ -13,7 +13,7 @@ type whoAmIResponse struct {
 
 func (rd whoAmIResponse) Render(w http.ResponseWriter, r *http.Request) error { return nil }
 
-func WhoAmI(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) WhoAmI(w http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())
 	render.Status(r, http.StatusOK)
 	err := render.Render(w, r, whoAmIResponse{UserId: claims["sub"].(string)})

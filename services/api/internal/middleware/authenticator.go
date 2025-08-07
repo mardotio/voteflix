@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/go-chi/jwtauth/v5"
 	"net/http"
-	"voteflix/api/src/utils"
+	"voteflix/api/internal/utils"
 )
 
 type authErrorResponse struct {

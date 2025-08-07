@@ -5,16 +5,6 @@ import (
 	"time"
 )
 
-var tokenAuth *jwtauth.JWTAuth
-
-func GetTokenAuth() *jwtauth.JWTAuth {
-	if nil == tokenAuth {
-		tokenAuth = jwtauth.New("HS256", GetAppConfig().JwtSecret, nil)
-		return tokenAuth
-	}
-	return tokenAuth
-}
-
 type JwtClaims struct {
 	Sub string
 }
