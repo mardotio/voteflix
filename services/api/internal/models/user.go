@@ -2,11 +2,13 @@ package models
 
 import (
 	"github.com/uptrace/bun"
-	"time"
 )
 
 type User struct {
 	bun.BaseModel `bun:"table:users"`
-	Id            string    `bun:"type:uuid,pk,default:gen_random_uuid()"`
-	CreatedAt     time.Time `bun:"default:current_timestamp"`
+	PrimaryUuidId
+	Timestamps
+	DiscordId       string  `bun:"discord_id,type:varchar(100),notnull,unique"`
+	DiscordUsername string  `bun:"discord_username,type:varchar(100),notnull"`
+	DiscordAvatarId *string `bun:"discord_avatar_id,type:varchar(100)"`
 }

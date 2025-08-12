@@ -9,6 +9,9 @@ services:
       - POSTGRES_HOST
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    profiles:
+      - core
+      - migrations
   api:
     build:
       context: ../services/api
@@ -18,8 +21,8 @@ services:
     develop:
       watch:
         - action: sync
-          path: ../services/api/cmd
-          target: /app/cmd
+          path: ../services/api/cmd/voteflix
+          target: /app/cmd/voteflix
         - action: sync
           path: ../services/api/internal
           target: /app/internal
@@ -31,6 +34,8 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_PORT
       - POSTGRES_HOST
+    profiles:
+      - core
   migrations:
     build:
       context: ../services/api
@@ -45,6 +50,8 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_PORT
       - POSTGRES_HOST
+    profiles:
+      - migrations
   proxy:
     image: nginx
     depends_on:
@@ -53,3 +60,5 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "3000:3000"
+    profiles:
+      - core
