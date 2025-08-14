@@ -11,5 +11,5 @@ type Movie struct {
 	Status    string `bun:"status,type:varchar(15),notnull"`
 	Seed      int64  `bun:"seed,type:integer,notnull"`
 	CreatorId string `bun:"creator_id,type:uuid,notnull"`
-	Creator   *User  `bun:"rel:belongs_to,join:creator_id=id"`
+	Creator   *User  `bun:"rel:belongs-to,join:creator_id=id"`
 }

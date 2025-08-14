@@ -1,27 +1,25 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/go-chi/jwtauth/v5"
 	"net/http"
 	"voteflix/api/internal/utils"
 )
 
-type authErrorResponse struct {
-	Message string `json:"message"`
-}
-
 func Authenticator() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		handler := func(w http.ResponseWriter, r *http.Request) {
 			token, _, err := jwtauth.FromContext(r.Context())
+			errorSender := utils.NewJsonSender(w, r)
 
 			if err != nil {
-				utils.JsonError(w, authErrorResponse{Message: err.Error()}, http.StatusUnauthorized)
+				errorSender.Unauthorized(err)
 				return
 			}
 
 			if token == nil {
-				utils.JsonError(w, authErrorResponse{Message: "no token found"}, http.StatusUnauthorized)
+				errorSender.Unauthorized(fmt.Errorf("not token found"))
 				return
 			}
 

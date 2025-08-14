@@ -6,6 +6,7 @@ import (
 	"voteflix/api/internal/app"
 	"voteflix/api/internal/middleware"
 	"voteflix/api/internal/routes/auth"
+	"voteflix/api/internal/routes/bot"
 	"voteflix/api/internal/routes/users"
 )
 
@@ -14,6 +15,7 @@ func Router(app *app.App) {
 
 	authHandler := auth.NewAuthHandler(app)
 	usersHandler := users.NewUsersHandler(app)
+	botHandler := bot.NewBotHandler(app)
 
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(app.JwtAuth()))
@@ -27,6 +29,12 @@ func Router(app *app.App) {
 	r.Group(func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/token", authHandler.CreateToken)
+		})
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Route("/bot", func(r chi.Router) {
+			r.Post("/list", botHandler.CreateList)
 		})
 	})
 }

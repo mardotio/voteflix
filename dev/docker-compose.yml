@@ -52,6 +52,20 @@ services:
       - POSTGRES_HOST
     profiles:
       - migrations
+  bot:
+    build:
+      context: ../services/bot
+      dockerfile: dev/Dockerfile
+    environment:
+      - BOT_DISCORD_APP_ID
+      - BOT_DISCORD_BOT_TOKEN
+    develop:
+      watch:
+        - action: sync+restart
+          path: ../services/bot/src
+          target: /app/src
+    profiles:
+      - core
   proxy:
     image: nginx
     depends_on:
