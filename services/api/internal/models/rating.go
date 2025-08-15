@@ -8,6 +8,6 @@ type Rating struct {
 	MovieId    string `bun:"movie_id,pk,type:uuid,notnull"`
 	ListUserId string `bun:"list_user_id,pk,type:uuid,notnull"`
 	Rating     int64  `bun:"rating,type:smallint,notnull"`
-	Movie      *Movie `bun:"rel:belongs_to,join:movie_id=id"`
-	List       *List  `bun:"rel:belongs_to,join:list_id=id"`
+	Movie      *Movie `bun:"rel:belongs-to,join:movie_id=id"`
+	List       *List  `bun:"rel:belongs-to,join:list_id=id"`
 }

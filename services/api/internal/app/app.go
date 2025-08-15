@@ -5,19 +5,23 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/jwtauth/v5"
+	"github.com/go-playground/validator/v10"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"github.com/uptrace/bun/extra/bundebug"
 	"log"
 	"net/http"
+	"reflect"
+	"strings"
 	"sync"
 )
 
 type App struct {
-	config  *AppConfig
-	router  *chi.Mux
-	jwtAuth *jwtauth.JWTAuth
+	config   *AppConfig
+	router   *chi.Mux
+	jwtAuth  *jwtauth.JWTAuth
+	validate *validator.Validate
 
 	dbOnce sync.Once
 	db     *bun.DB
@@ -27,9 +31,24 @@ func (app *App) initJwtAuth() {
 	app.jwtAuth = jwtauth.New("HS256", app.config.jwtSecret, nil)
 }
 
+func (app *App) initValidate() {
+	v := validator.New(validator.WithRequiredStructEnabled())
+
+	v.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+		if name == "-" {
+			return ""
+		}
+		return name
+	})
+
+	app.validate = v
+}
+
 func (app *App) init() {
 	app.loadAppConfig()
 	app.initJwtAuth()
+	app.initValidate()
 	app.initRouter()
 }
 
@@ -38,6 +57,8 @@ func (app *App) Router() *chi.Mux { return app.router }
 func (app *App) Config() *AppConfig { return app.config }
 
 func (app *App) JwtAuth() *jwtauth.JWTAuth { return app.jwtAuth }
+
+func (app *App) Validate() *validator.Validate { return app.validate }
 
 func (app *App) Db() *bun.DB {
 	app.dbOnce.Do(func() {
