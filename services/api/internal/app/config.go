@@ -15,6 +15,7 @@ var envVars = struct {
 	ApiPort          string
 	ApiJwtSecret     string
 	ApiInDocker      string
+	ApiBotKey        string
 	PostgresHost     string
 	PostgresPort     string
 	PostgresUser     string
@@ -24,6 +25,7 @@ var envVars = struct {
 	ApiPort:          "API_PORT",
 	ApiJwtSecret:     "API_JWT_SECRET",
 	ApiInDocker:      "API_IN_DOCKER",
+	ApiBotKey:        "API_BOT_KEY",
 	PostgresHost:     "POSTGRES_HOST",
 	PostgresPort:     "POSTGRES_PORT",
 	PostgresUser:     "POSTGRES_USER",
@@ -34,6 +36,7 @@ var envVars = struct {
 type AppConfig struct {
 	Port             int
 	jwtSecret        []byte
+	ApiBotKey        string
 	ApiInDocker      bool
 	PostgresHost     string
 	PostgresPort     int
@@ -117,6 +120,21 @@ func (config *AppConfig) setApiJwtSecret(errSlice *[]string) {
 	config.jwtSecret = []byte(secret)
 }
 
+func (config *AppConfig) setApiBotKey(errSlice *[]string) {
+	secret, secretErr := validateRequiredString(envVars.ApiBotKey, errSlice)
+
+	if secretErr != nil {
+		return
+	}
+
+	if minSecretLength > len(secret) {
+		*errSlice = append(*errSlice, fmt.Sprintf("- %s must be at least %d characters", envVars.ApiBotKey, minSecretLength))
+		return
+	}
+
+	config.ApiBotKey = secret
+}
+
 func parseEnv() (*AppConfig, error) {
 	log.Println("Loading application config")
 	var parseErr []string
@@ -125,6 +143,7 @@ func parseEnv() (*AppConfig, error) {
 
 	config.setApiPort(&parseErr)
 	config.setApiJwtSecret(&parseErr)
+	config.setApiBotKey(&parseErr)
 	config.setPostgresDb(&parseErr)
 	config.setPostgresUser(&parseErr)
 	config.setPostgresHost(&parseErr)
