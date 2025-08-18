@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	cfg := app.Init().Config()
+	cfg := app.Init(true).Config()
 	m, connectErr := migrate.New(
 		"file://migrations",
 		fmt.Sprintf(

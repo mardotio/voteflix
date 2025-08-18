@@ -46,9 +46,6 @@ services:
     depends_on:
       - db
     environment:
-      - API_JWT_SECRET
-      - API_PORT
-      - API_BOT_KEY
       - POSTGRES_DB
       - POSTGRES_USER
       - POSTGRES_PASSWORD

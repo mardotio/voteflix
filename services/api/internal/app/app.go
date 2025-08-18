@@ -22,6 +22,7 @@ type App struct {
 	router   *chi.Mux
 	jwtAuth  *jwtauth.JWTAuth
 	validate *validator.Validate
+	dbOnly   bool
 
 	dbOnce sync.Once
 	db     *bun.DB
@@ -47,9 +48,12 @@ func (app *App) initValidate() {
 
 func (app *App) init() {
 	app.loadAppConfig()
-	app.initJwtAuth()
-	app.initValidate()
-	app.initRouter()
+
+	if !app.dbOnly {
+		app.initJwtAuth()
+		app.initValidate()
+		app.initRouter()
+	}
 }
 
 func (app *App) Router() *chi.Mux { return app.router }
@@ -96,8 +100,10 @@ func (app *App) Serve(addRoutes func(*App)) {
 	}
 }
 
-func Init() *App {
-	app := &App{}
+func Init(dbOnly bool) *App {
+	app := &App{
+		dbOnly: dbOnly,
+	}
 
 	app.init()
 
