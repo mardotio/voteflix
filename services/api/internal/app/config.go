@@ -1,7 +1,6 @@
 package app
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -14,7 +13,6 @@ const minSecretLength = 32
 var envVars = struct {
 	ApiPort          string
 	ApiJwtSecret     string
-	ApiInDocker      string
 	ApiBotKey        string
 	PostgresHost     string
 	PostgresPort     string
@@ -24,7 +22,6 @@ var envVars = struct {
 }{
 	ApiPort:          "API_PORT",
 	ApiJwtSecret:     "API_JWT_SECRET",
-	ApiInDocker:      "API_IN_DOCKER",
 	ApiBotKey:        "API_BOT_KEY",
 	PostgresHost:     "POSTGRES_HOST",
 	PostgresPort:     "POSTGRES_PORT",
@@ -37,128 +34,104 @@ type AppConfig struct {
 	Port             int
 	jwtSecret        []byte
 	ApiBotKey        string
-	ApiInDocker      bool
 	PostgresHost     string
 	PostgresPort     int
 	PostgresUser     string
 	PostgresPassword string
 	PostgresDb       string
+
+	errors []string
 }
 
-func validateRequiredString(envVarName string, errSlice *[]string) (string, error) {
-	value := os.Getenv(envVarName)
+type validatorFn[T comparable] func(T, string) (T, error)
 
-	if value == "" {
-		err := fmt.Sprintf("- %s cannot be empty", envVarName)
-		*errSlice = append(*errSlice, err)
-		return "", errors.New(err)
-	}
-
-	return value, nil
+func (c *AppConfig) appendError(e error) {
+	c.errors = append(c.errors, e.Error())
 }
 
-func validateRequiredPort(envVarName string, errSlice *[]string) (int, error) {
+func (c *AppConfig) validateInt(envVarName string, validators []validatorFn[int]) int {
 	value, err := strconv.Atoi(os.Getenv(envVarName))
 
 	if err != nil {
-		err := fmt.Sprintf("- %s must be a valid port", envVarName)
-		*errSlice = append(*errSlice, err)
-		return -1, errors.New(err)
+		c.appendError(fmt.Errorf("- %s must be an integer", envVarName))
+		return -1
+	}
+
+	for _, validator := range validators {
+		value, err = validator(value, envVarName)
+
+		if err != nil {
+			c.appendError(err)
+			break
+		}
+	}
+
+	return value
+}
+
+func (c *AppConfig) validateString(envVarName string, validators []validatorFn[string]) string {
+	value := os.Getenv(envVarName)
+	var err error
+
+	for _, validator := range validators {
+		value, err = validator(value, envVarName)
+
+		if err != nil {
+			c.appendError(err)
+			break
+		}
+	}
+
+	return value
+}
+
+func validateMinLength(minLength int) validatorFn[string] {
+	return func(value string, envVarName string) (string, error) {
+
+		if len(value) < minLength {
+			return "", fmt.Errorf("- %s must be at least %d characters", envVarName, minLength)
+		}
+
+		return value, nil
+	}
+}
+
+func validateRequiredPort(value int, envVarName string) (int, error) {
+	minPort, maxPort := 1024, 49151
+
+	if value < minPort || value > maxPort {
+		return -1, fmt.Errorf("- %s must be a valid port (%d - %d)", envVarName, minPort, maxPort)
 	}
 
 	return value, nil
 }
 
-func (config *AppConfig) setPostgresPort(errSlice *[]string) {
-	if port, err := validateRequiredPort(envVars.PostgresPort, errSlice); err == nil {
-		config.PostgresPort = port
-	}
-}
-
-func (config *AppConfig) setPostgresHost(errSlice *[]string) {
-	if host, err := validateRequiredString(envVars.PostgresHost, errSlice); err == nil {
-		config.PostgresHost = host
-	}
-}
-
-func (config *AppConfig) setPostgresPassword(errSlice *[]string) {
-	if password, err := validateRequiredString(envVars.PostgresPassword, errSlice); err == nil {
-		config.PostgresPassword = password
-	}
-}
-
-func (config *AppConfig) setPostgresDb(errSlice *[]string) {
-	if db, err := validateRequiredString(envVars.PostgresDb, errSlice); err == nil {
-		config.PostgresDb = db
-	}
-}
-
-func (config *AppConfig) setPostgresUser(errSlice *[]string) {
-	if user, err := validateRequiredString(envVars.PostgresUser, errSlice); err == nil {
-		config.PostgresUser = user
-	}
-}
-
-func (config *AppConfig) setApiPort(errSlice *[]string) {
-	if port, err := validateRequiredPort(envVars.ApiPort, errSlice); err == nil {
-		config.Port = port
-	}
-}
-
-func (config *AppConfig) setApiJwtSecret(errSlice *[]string) {
-	secret, secretErr := validateRequiredString(envVars.ApiJwtSecret, errSlice)
-
-	if secretErr != nil {
-		return
-	}
-
-	if minSecretLength > len(secret) {
-		*errSlice = append(*errSlice, fmt.Sprintf("- %s must be at least %d characters", envVars.ApiJwtSecret, minSecretLength))
-		return
-	}
-
-	config.jwtSecret = []byte(secret)
-}
-
-func (config *AppConfig) setApiBotKey(errSlice *[]string) {
-	secret, secretErr := validateRequiredString(envVars.ApiBotKey, errSlice)
-
-	if secretErr != nil {
-		return
-	}
-
-	if minSecretLength > len(secret) {
-		*errSlice = append(*errSlice, fmt.Sprintf("- %s must be at least %d characters", envVars.ApiBotKey, minSecretLength))
-		return
-	}
-
-	config.ApiBotKey = secret
-}
-
-func parseEnv() (*AppConfig, error) {
+func newAppConfig(dbOnly bool) (*AppConfig, error) {
 	log.Println("Loading application config")
-	var parseErr []string
 
-	config := AppConfig{}
+	c := AppConfig{}
 
-	config.setApiPort(&parseErr)
-	config.setApiJwtSecret(&parseErr)
-	config.setApiBotKey(&parseErr)
-	config.setPostgresDb(&parseErr)
-	config.setPostgresUser(&parseErr)
-	config.setPostgresHost(&parseErr)
-	config.setPostgresPassword(&parseErr)
-	config.setPostgresPort(&parseErr)
-
-	if nil == parseErr {
-		return &config, nil
+	if !dbOnly {
+		c.Port = c.validateInt(envVars.ApiPort, []validatorFn[int]{validateRequiredPort})
+		c.jwtSecret = []byte(c.validateString(envVars.ApiJwtSecret, []validatorFn[string]{validateMinLength(minSecretLength)}))
+		c.ApiBotKey = c.validateString(envVars.ApiBotKey, []validatorFn[string]{validateMinLength(minSecretLength)})
 	}
 
-	return nil, fmt.Errorf("\n%s", strings.Join(parseErr[:], "\n"))
+	c.PostgresPort = c.validateInt(envVars.PostgresPort, []validatorFn[int]{validateRequiredPort})
+	c.PostgresDb = c.validateString(envVars.PostgresDb, []validatorFn[string]{validateMinLength(1)})
+	c.PostgresHost = c.validateString(envVars.PostgresHost, []validatorFn[string]{validateMinLength(1)})
+	c.PostgresUser = c.validateString(envVars.PostgresUser, []validatorFn[string]{validateMinLength(1)})
+	c.PostgresPassword = c.validateString(envVars.PostgresPassword, []validatorFn[string]{validateMinLength(1)})
+
+	if nil == c.errors {
+		return &c, nil
+	}
+
+	return nil, fmt.Errorf("\n%s", strings.Join(c.errors[:], "\n"))
 }
 
 func (app *App) loadAppConfig() {
-	config, err := parseEnv()
+	config, err := newAppConfig(app.dbOnly)
 
 	if nil != err {
 		log.Fatal(err)

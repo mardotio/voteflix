@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	app.Init().Serve(routes.Router)
+	app.Init(false).Serve(routes.Router)
 }
