@@ -11,15 +11,15 @@ func Authenticator() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		handler := func(w http.ResponseWriter, r *http.Request) {
 			token, _, err := jwtauth.FromContext(r.Context())
-			errorSender := utils.NewJsonSender(w, r)
+			jsonSender := utils.NewJsonSender(w, r)
 
 			if err != nil {
-				errorSender.Unauthorized(err)
+				jsonSender.Unauthorized(err)
 				return
 			}
 
 			if token == nil {
-				errorSender.Unauthorized(fmt.Errorf("not token found"))
+				jsonSender.Unauthorized(fmt.Errorf("no token found"))
 				return
 			}
 

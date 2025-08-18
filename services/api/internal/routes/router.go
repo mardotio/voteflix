@@ -33,6 +33,8 @@ func Router(app *app.App) {
 	})
 
 	r.Group(func(r chi.Router) {
+		r.Use(middleware.BotAuthenticator(app.Config()))
+
 		r.Route("/bot", func(r chi.Router) {
 			r.Post("/list", botHandler.CreateList)
 		})
