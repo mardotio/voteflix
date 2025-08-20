@@ -1,22 +1,28 @@
 import generateEnvironment from "@mardotio/generate-environment";
 
 const validateEnv = () => {
-    const result = generateEnvironment({
-        required: ["BOT_DISCORD_APP_ID", "BOT_DISCORD_BOT_TOKEN", "API_BOT_KEY"] as const,
-        optional: ["ENVIRONMENT_MODE"] as const,
-    });
+  const result = generateEnvironment({
+    required: [
+      "BOT_DISCORD_APP_ID",
+      "BOT_DISCORD_BOT_TOKEN",
+      "API_BOT_KEY",
+      "BOT_JWT_SECRET",
+      "BOT_UI_URL",
+    ] as const,
+    optional: ["ENVIRONMENT_MODE"] as const,
+  });
 
-    if (result.errors !== null) {
-        throw new Error(
-            `The following environment variables were not set:\n${result.errors.join("\n")}`,
-        );
-    }
+  if (result.errors !== null) {
+    throw new Error(
+      `The following environment variables were not set:\n${result.errors.join("\n")}`,
+    );
+  }
 
-    return result.environment;
+  return result.environment;
 };
 
 export const BOT_ENVIRONMENT = validateEnv();
 
 export const isProduction =
-    !BOT_ENVIRONMENT.ENVIRONMENT_MODE ||
-    BOT_ENVIRONMENT.ENVIRONMENT_MODE.toLowerCase() === "production";
+  !BOT_ENVIRONMENT.ENVIRONMENT_MODE ||
+  BOT_ENVIRONMENT.ENVIRONMENT_MODE.toLowerCase() === "production";

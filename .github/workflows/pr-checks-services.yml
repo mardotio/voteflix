@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       api: ${{ steps.filter.outputs.api }}
+      bot: ${{ steps.filter.outputs.bot }}
     steps:
       - uses: dorny/paths-filter@v3
         id: filter
@@ -19,6 +20,9 @@ jobs:
             api:
               - 'services/api/**/*.(go|mod|sum)'
               - 'services/api/.golangci.json'
+            bot:
+              - 'services/bot/**/*.(ts|json)'
+              - 'services/bot/.prettierrc'
 
   run-api-checks:
     name: Run API PR checks
@@ -38,3 +42,32 @@ jobs:
         with:
           version: v2.3
           working-directory: services/api
+
+  run-bot-checks:
+    name: Run Bot PR checks
+    needs: pr-changes
+    if: ${{ needs.pr-changes.outputs.bot == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/bot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.20"
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint bot
+        run: npm run format:check
