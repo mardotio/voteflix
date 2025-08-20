@@ -37,6 +37,7 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_PORT
       - POSTGRES_HOST
+      - BOT_JWT_SECRET
     profiles:
       - core
   migrations:
@@ -60,6 +61,8 @@ services:
     environment:
       - BOT_DISCORD_APP_ID
       - BOT_DISCORD_BOT_TOKEN
+      - BOT_JWT_SECRET
+      - BOT_UI_URL
       - API_BOT_KEY
     develop:
       watch:

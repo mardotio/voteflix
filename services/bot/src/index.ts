@@ -1,18 +1,12 @@
-import Discord from "discord.js";
-import {BOT_ENVIRONMENT} from "./utils/environment";
-import {guildCreate} from "./events/guildCreate";
+import { guildCreate } from "./events/guildCreate";
+import { interactionCreate } from "./events/interactionCreate";
+import { ready } from "./events/ready";
+import { discordClient } from "./utils/discord";
+import { BOT_ENVIRONMENT } from "./utils/environment";
 
-const client = new Discord.Client({
-    intents: [
-        Discord.GatewayIntentBits.Guilds,
-        Discord.GatewayIntentBits.GuildMessages,
-    ],
-});
+discordClient.once("ready", ready);
+discordClient.on("interactionCreate", interactionCreate);
+discordClient.on("guildCreate", guildCreate);
 
-client.once("ready", () => {
-    console.log(`Logged in as ${client.user?.tag}`);
-});
-
-client.on("guildCreate", guildCreate);
-
-(async () => await client.login(BOT_ENVIRONMENT.BOT_DISCORD_BOT_TOKEN))();
+(async () =>
+  await discordClient.login(BOT_ENVIRONMENT.BOT_DISCORD_BOT_TOKEN))();
