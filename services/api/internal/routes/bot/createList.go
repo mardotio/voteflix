@@ -3,12 +3,10 @@ package bot
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 	"github.com/uptrace/bun"
-	"log"
 	"net/http"
 	"time"
 	"voteflix/api/internal/models"
@@ -95,13 +93,6 @@ func createListUser(ctx context.Context, tx bun.Tx, body *createListRequest, use
 	return &listUser, nil
 }
 
-func txnRollback(tx *bun.Tx) {
-	err := tx.Rollback()
-	if err != nil && !errors.Is(err, sql.ErrTxDone) {
-		log.Println(err)
-	}
-}
-
 func (h *Handler) CreateList(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	db := h.app.Db()
@@ -127,7 +118,7 @@ func (h *Handler) CreateList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx, txErr := db.BeginTx(ctx, &sql.TxOptions{})
-	defer txnRollback(&tx)
+	defer utils.TxnRollback(&tx)
 
 	if txErr != nil {
 		jsonSender.InternalServerError(txErr)
@@ -151,12 +142,12 @@ func (h *Handler) CreateList(w http.ResponseWriter, r *http.Request) {
 	_, listUserErr := createListUser(ctx, tx, body, userId, list.Id)
 
 	if listUserErr != nil {
-		jsonSender.InternalServerError(listErr)
+		jsonSender.InternalServerError(listUserErr)
 		return
 	}
 
 	if err := tx.Commit(); err != nil {
-		jsonSender.InternalServerError(listErr)
+		jsonSender.InternalServerError(err)
 		return
 	}
 
