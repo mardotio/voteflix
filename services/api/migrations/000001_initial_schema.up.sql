@@ -1,68 +1,71 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+create extension if not exists "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    discord_id VARCHAR(100) NOT NULL UNIQUE,
-    discord_username VARCHAR(100) NOT NULL,
-    discord_avatar_id VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
+create table if not exists users (
+    id uuid primary key default gen_random_uuid(),
+    discord_id varchar(100) not null unique,
+    discord_username varchar(100) not null,
+    discord_avatar_id varchar(100),
+    created_at timestamp default current_timestamp,
+    updated_at timestamp
 );
 
-CREATE TABLE IF NOT EXISTS lists (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name varchar(100) NOT NULL,
-    discord_server_id varchar(100) NOT NULL UNIQUE,
-    creator_id UUID NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
+create table if not exists lists (
+    id uuid primary key default gen_random_uuid(),
+    name varchar(100) not null,
+    discord_server_id varchar(100) not null unique,
+    creator_id uuid not null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp,
 
-    FOREIGN KEY (creator_id) REFERENCES users(id)
+    foreign key (creator_id) references users(id)
 );
 
-CREATE TABLE IF NOT EXISTS list_users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
-    list_id UUID NOT NULL,
-    discord_nickname VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
+create table if not exists list_users (
+    user_id uuid not null,
+    list_id uuid not null,
+    discord_nickname varchar(32),
+    created_at timestamp default current_timestamp,
+    updated_at timestamp,
 
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (list_id) REFERENCES lists(id),
-    UNIQUE  (user_id, list_id)
+    foreign key (user_id) references users(id),
+    foreign key (list_id) references lists(id),
+    primary key (user_id, list_id)
 );
 
-CREATE TABLE IF NOT EXISTS movies (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    list_id UUID NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    status VARCHAR(15) NOT NULL,
-    seed INTEGER NOT NULL,
-    creator_id UUID NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
+create table if not exists movies (
+    id uuid primary key default gen_random_uuid(),
+    list_id uuid not null,
+    name varchar(255) not null,
+    status varchar(15) not null,
+    seed integer not null,
+    creator_id uuid not null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp,
 
-    FOREIGN KEY (list_id) REFERENCES lists(id),
-    FOREIGN KEY (creator_id) REFERENCES list_users(id)
+    foreign key (list_id) references lists(id),
+    foreign key (creator_id) references users(id)
 );
 
-CREATE TABLE IF NOT EXISTS ratings (
-    movie_id UUID NOT NULL,
-    list_user_id UUID NOT NULL,
-    rating SMALLINT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
+create table if not exists ratings (
+    user_id uuid not null,
+    movie_id uuid not null,
+    rating smallint not null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp,
 
-    PRIMARY KEY (movie_id, list_user_id)
+    foreign key (user_id) references users(id),
+    foreign key (movie_id) references movies(id),
+    primary key (movie_id, user_id)
 );
 
-CREATE TABLE IF NOT EXISTS votes (
-    movie_id UUID NOT NULL,
-    list_user_id UUID NOT NULL,
-    is_approval BOOLEAN NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
+create table if not exists votes (
+    user_id uuid not null,
+    movie_id uuid not null,
+    is_approval boolean not null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp,
 
-    PRIMARY KEY (movie_id, list_user_id)
+    foreign key (user_id) references users(id),
+    foreign key (movie_id) references movies(id),
+    primary key (user_id, movie_id)
 );

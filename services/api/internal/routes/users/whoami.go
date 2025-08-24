@@ -32,7 +32,8 @@ func (h *Handler) WhoAmI(w http.ResponseWriter, r *http.Request) {
 
 	userQuery := db.NewSelect().
 		Model(&user).
-		Where("list_user.id = ?", userClaims.Sub).
+		Where("list_user.user_id = ?", userClaims.Sub).
+		Where("list_user.list_id = ?", userClaims.Scope).
 		Relation("User").
 		Relation("List")
 
@@ -42,7 +43,7 @@ func (h *Handler) WhoAmI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := whoAmIResponse{
-		Id: user.Id,
+		Id: user.User.Id,
 		List: listDetails{
 			Id:       user.List.Id,
 			Name:     user.List.Name,

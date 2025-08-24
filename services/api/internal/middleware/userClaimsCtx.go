@@ -12,8 +12,8 @@ func UserClaimsCtx() func(http.Handler) http.Handler {
 			_, claims, _ := jwtauth.FromContext(r.Context())
 
 			userClaims := utils.UserJwtClaims{
-				Sub:  claims["sub"].(string),
-				List: claims["list"].(string),
+				Sub:   claims["sub"].(string),
+				Scope: claims["scope"].(string),
 			}
 
 			ctx := userClaims.WithValue(r.Context())
