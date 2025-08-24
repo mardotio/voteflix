@@ -127,6 +127,13 @@ func (j *JsonSender) Unauthorized(err error) {
 	sendError(j, unauthorizedError(err.Error()))
 }
 
+type notFoundError string
+
+func (j *JsonSender) NotFound(err error) {
+	j.code = http.StatusNotFound
+	sendError(j, notFoundError(err.Error()))
+}
+
 func (j *JsonSender) Created(res render.Renderer) {
 	j.code = http.StatusCreated
 	send(j, res)

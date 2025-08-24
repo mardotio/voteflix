@@ -19,6 +19,8 @@ var envVars = struct {
 	PostgresUser     string
 	PostgresPassword string
 	PostgresDb       string
+	BotJwtSecret     string
+	EnvironmentMode  string
 }{
 	ApiPort:          "API_PORT",
 	ApiJwtSecret:     "API_JWT_SECRET",
@@ -28,6 +30,8 @@ var envVars = struct {
 	PostgresUser:     "POSTGRES_USER",
 	PostgresPassword: "POSTGRES_PASSWORD",
 	PostgresDb:       "POSTGRES_DB",
+	BotJwtSecret:     "BOT_JWT_SECRET",
+	EnvironmentMode:  "ENVIRONMENT_MODE",
 }
 
 type AppConfig struct {
@@ -39,6 +43,8 @@ type AppConfig struct {
 	PostgresUser     string
 	PostgresPassword string
 	PostgresDb       string
+	botJwtSecret     []byte
+	EnvironmentMode  string
 
 	errors []string
 }
@@ -85,6 +91,29 @@ func (c *AppConfig) validateString(envVarName string, validators []validatorFn[s
 	return value
 }
 
+func (c *AppConfig) validateEnvironment(envVarName string, validators []validatorFn[string]) string {
+	var value string
+
+	if v := os.Getenv(envVarName); v == "" {
+		value = strings.ToLower(v)
+	} else {
+		value = "development"
+	}
+
+	var err error
+
+	for _, validator := range validators {
+		value, err = validator(value, envVarName)
+
+		if err != nil {
+			c.appendError(err)
+			break
+		}
+	}
+
+	return value
+}
+
 func validateMinLength(minLength int) validatorFn[string] {
 	return func(value string, envVarName string) (string, error) {
 
@@ -106,6 +135,10 @@ func validateRequiredPort(value int, envVarName string) (int, error) {
 	return value, nil
 }
 
+func (c *AppConfig) IsProduction() bool {
+	return c.EnvironmentMode == "production"
+}
+
 func newAppConfig(dbOnly bool) (*AppConfig, error) {
 	log.Println("Loading application config")
 
@@ -115,8 +148,11 @@ func newAppConfig(dbOnly bool) (*AppConfig, error) {
 		c.Port = c.validateInt(envVars.ApiPort, []validatorFn[int]{validateRequiredPort})
 		c.jwtSecret = []byte(c.validateString(envVars.ApiJwtSecret, []validatorFn[string]{validateMinLength(minSecretLength)}))
 		c.ApiBotKey = c.validateString(envVars.ApiBotKey, []validatorFn[string]{validateMinLength(minSecretLength)})
+
+		c.botJwtSecret = []byte(c.validateString(envVars.BotJwtSecret, []validatorFn[string]{validateMinLength(minSecretLength)}))
 	}
 
+	c.EnvironmentMode = c.validateEnvironment(envVars.EnvironmentMode, []validatorFn[string]{})
 	c.PostgresPort = c.validateInt(envVars.PostgresPort, []validatorFn[int]{validateRequiredPort})
 	c.PostgresDb = c.validateString(envVars.PostgresDb, []validatorFn[string]{validateMinLength(1)})
 	c.PostgresHost = c.validateString(envVars.PostgresHost, []validatorFn[string]{validateMinLength(1)})

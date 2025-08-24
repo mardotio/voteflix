@@ -18,11 +18,12 @@ import (
 )
 
 type App struct {
-	config   *AppConfig
-	router   *chi.Mux
-	jwtAuth  *jwtauth.JWTAuth
-	validate *validator.Validate
-	dbOnly   bool
+	config     *AppConfig
+	router     *chi.Mux
+	jwtAuth    *jwtauth.JWTAuth
+	botJwtAuth *jwtauth.JWTAuth
+	validate   *validator.Validate
+	dbOnly     bool
 
 	dbOnce sync.Once
 	db     *bun.DB
@@ -30,6 +31,10 @@ type App struct {
 
 func (app *App) initJwtAuth() {
 	app.jwtAuth = jwtauth.New("HS256", app.config.jwtSecret, nil)
+}
+
+func (app *App) initBotJwtAuth() {
+	app.botJwtAuth = jwtauth.New("HS256", app.config.botJwtSecret, nil)
 }
 
 func (app *App) initValidate() {
@@ -51,6 +56,7 @@ func (app *App) init() {
 
 	if !app.dbOnly {
 		app.initJwtAuth()
+		app.initBotJwtAuth()
 		app.initValidate()
 		app.initRouter()
 	}
@@ -61,6 +67,8 @@ func (app *App) Router() *chi.Mux { return app.router }
 func (app *App) Config() *AppConfig { return app.config }
 
 func (app *App) JwtAuth() *jwtauth.JWTAuth { return app.jwtAuth }
+
+func (app *App) BotJwtAuth() *jwtauth.JWTAuth { return app.botJwtAuth }
 
 func (app *App) Validate() *validator.Validate { return app.validate }
 
