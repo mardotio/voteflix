@@ -138,3 +138,8 @@ func (j *JsonSender) Created(res render.Renderer) {
 	j.code = http.StatusCreated
 	send(j, res)
 }
+
+func (j *JsonSender) Ok(res render.Renderer) {
+	j.code = http.StatusOK
+	send(j, res)
+}

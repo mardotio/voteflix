@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS votes;
-DROP TABLE IF EXISTS ratings;
-DROP TABLE IF EXISTS movies;
-DROP TABLE IF EXISTS list_users;
-DROP TABLE IF EXISTS lists;
-DROP TABLE IF EXISTS users;
+drop table if exists votes;
+drop table if exists ratings;
+drop table if exists movies;
+drop table if exists list_users;
+drop table if exists lists;
+drop table if exists users;
 
-DROP EXTENSION IF EXISTS "uuid-ossp";
+drop extension if exists "uuid-ossp";
