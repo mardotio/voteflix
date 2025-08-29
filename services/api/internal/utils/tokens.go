@@ -11,14 +11,14 @@ type userCtxKey string
 const userClaimsCtx userCtxKey = "userClaims"
 
 type UserJwtClaims struct {
-	Sub  string
-	List string
+	Sub   string
+	Scope string
 }
 
 func (claims UserJwtClaims) ToClaimsMap(duration time.Duration) map[string]interface{} {
 	claimsMap := map[string]interface{}{
-		"sub":  claims.Sub,
-		"list": claims.List,
+		"sub":   claims.Sub,
+		"scope": claims.Scope,
 	}
 	jwtauth.SetIssuedNow(claimsMap)
 	jwtauth.SetExpiryIn(claimsMap, duration)

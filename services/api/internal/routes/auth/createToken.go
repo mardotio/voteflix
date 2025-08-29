@@ -95,7 +95,7 @@ func getUserId(ctx context.Context, tx bun.Tx, claims utils.BotJwtClaims) (strin
 	return newUser.Id, nil
 }
 
-func getListUser(ctx context.Context, tx bun.Tx, claims utils.BotJwtClaims, userId string, listId string) (models.ListUser, error) {
+func updateOrCreateListUser(ctx context.Context, tx bun.Tx, claims utils.BotJwtClaims, userId string, listId string) error {
 	now := time.Now()
 
 	existingUser := models.ListUser{}
@@ -107,28 +107,29 @@ func getListUser(ctx context.Context, tx bun.Tx, claims utils.BotJwtClaims, user
 		Scan(ctx)
 
 	if existingUserErr != nil && !errors.Is(existingUserErr, sql.ErrNoRows) {
-		return existingUser, existingUserErr
+		return existingUserErr
 	}
 
 	if existingUserErr == nil {
 		shouldUpdate := !utils.IsEqual(existingUser.DiscordNickname, claims.Nickname)
 
 		if !shouldUpdate {
-			return existingUser, nil
+			return nil
 		}
 
 		_, updateErr := tx.NewUpdate().
 			Model(&existingUser).
-			Where("id = ?", existingUser.Id).
+			Where("user_id = ?", userId).
+			Where("list_id = ?", listId).
 			Set("discord_nickname = ?", claims.Nickname).
 			Set("updated_at = ?", now).
 			Exec(ctx)
 
 		if updateErr != nil {
-			return existingUser, updateErr
+			return updateErr
 		}
 
-		return existingUser, nil
+		return nil
 	}
 
 	newUser := models.ListUser{
@@ -145,10 +146,10 @@ func getListUser(ctx context.Context, tx bun.Tx, claims utils.BotJwtClaims, user
 		Exec(ctx)
 
 	if newUserError != nil {
-		return newUser, newUserError
+		return newUserError
 	}
 
-	return newUser, nil
+	return nil
 }
 
 func (h *Handler) CreateToken(w http.ResponseWriter, r *http.Request) {
@@ -179,10 +180,8 @@ func (h *Handler) CreateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	listUser, listUserErr := getListUser(ctx, tx, botClaims, userId, serverListId)
-
-	if listUserErr != nil {
-		jsonSender.InternalServerError(listUserErr)
+	if err := updateOrCreateListUser(ctx, tx, botClaims, userId, serverListId); err != nil {
+		jsonSender.InternalServerError(err)
 		return
 	}
 
@@ -191,7 +190,7 @@ func (h *Handler) CreateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims := utils.UserJwtClaims{Sub: listUser.Id, List: serverListId}
+	claims := utils.UserJwtClaims{Sub: userId, Scope: serverListId}
 	token, tokenString, _ := h.app.JwtAuth().Encode(claims.ToClaimsMap(time.Hour * 1))
 	jsonSender.Created(createTokenResponse{Token: tokenString, ExpiresAt: utils.JsonEpochTime(token.Expiration())})
 }
