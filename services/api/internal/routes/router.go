@@ -7,6 +7,7 @@ import (
 	"voteflix/api/internal/middleware"
 	"voteflix/api/internal/routes/auth"
 	"voteflix/api/internal/routes/bot"
+	"voteflix/api/internal/routes/movies"
 	"voteflix/api/internal/routes/users"
 )
 
@@ -16,7 +17,9 @@ func Router(app *app.App) {
 	authHandler := auth.NewAuthHandler(app)
 	usersHandler := users.NewUsersHandler(app)
 	botHandler := bot.NewBotHandler(app)
+	moviesHandler := movies.NewMoviesHAndler(app)
 
+	//Auth related routes
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(app.BotJwtAuth()))
 		r.Use(middleware.Authenticator())
@@ -27,16 +30,7 @@ func Router(app *app.App) {
 		})
 	})
 
-	r.Group(func(r chi.Router) {
-		r.Use(jwtauth.Verifier(app.JwtAuth()))
-		r.Use(middleware.Authenticator())
-		r.Use(middleware.UserClaimsCtx())
-
-		r.Route("/users", func(r chi.Router) {
-			r.Get("/whoami", usersHandler.WhoAmI)
-		})
-	})
-
+	//Routes accessed by discord bot
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.BotAuthenticator(app.Config()))
 
@@ -45,6 +39,21 @@ func Router(app *app.App) {
 				r.Post("/token", botHandler.CreateToken)
 			}
 			r.Post("/list", botHandler.CreateList)
+		})
+	})
+
+	//Rotes for main application
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(app.JwtAuth()))
+		r.Use(middleware.Authenticator())
+		r.Use(middleware.UserClaimsCtx())
+
+		r.Route("/users", func(r chi.Router) {
+			r.Get("/whoami", usersHandler.WhoAmI)
+		})
+
+		r.Route("/movies", func(r chi.Router) {
+			r.Post("/", moviesHandler.CreateMovie)
 		})
 	})
 }

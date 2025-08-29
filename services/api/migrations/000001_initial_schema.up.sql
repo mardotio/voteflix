@@ -1,5 +1,14 @@
 create extension if not exists "uuid-ossp";
 
+create or replace function gen_random_movie_seed()
+returns integer
+as
+$$
+    begin
+        return floor(random() * (2147483647::bigint - -2147483648::bigint) - 2147483648::bigint)::integer;
+    end;
+$$ language 'plpgsql' STRICT;
+
 create table if not exists users (
     id uuid primary key default gen_random_uuid(),
     discord_id varchar(100) not null unique,
@@ -37,13 +46,15 @@ create table if not exists movies (
     list_id uuid not null,
     name varchar(255) not null,
     status varchar(15) not null,
-    seed integer not null,
+    seed integer default gen_random_movie_seed(),
     creator_id uuid not null,
     created_at timestamp default current_timestamp,
     updated_at timestamp,
 
     foreign key (list_id) references lists(id),
-    foreign key (creator_id) references users(id)
+    foreign key (creator_id) references users(id),
+
+    constraint valid_status check (status in ('pending', 'approved', 'watched', 'rejected'))
 );
 
 create table if not exists ratings (
