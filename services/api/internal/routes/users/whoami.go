@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"voteflix/api/internal/middleware"
 	"voteflix/api/internal/models"
 	"voteflix/api/internal/utils"
 )
@@ -26,7 +27,7 @@ func (h *Handler) WhoAmI(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	jsonSender := utils.NewJsonSender(w, r)
 
-	userClaims := utils.GetUserClaimsFromCtx(ctx)
+	userClaims := middleware.GetUserClaimsFromCtx(ctx)
 
 	user := models.ListUser{}
 

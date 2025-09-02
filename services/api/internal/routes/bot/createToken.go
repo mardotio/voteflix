@@ -45,6 +45,6 @@ func (h *Handler) CreateToken(w http.ResponseWriter, r *http.Request) {
 		Avatar:   body.Avatar,
 		Nickname: body.Nickname,
 	}
-	token, tokenString, _ := h.app.BotJwtAuth().Encode(claims.ToClaimsMap(time.Minute * 2))
+	token, tokenString, _ := utils.GetAppToken(h.app, claims, time.Minute*2)
 	jsonSender.Created(createTokenResponse{Token: tokenString, ExpiresAt: utils.JsonEpochTime(token.Expiration())})
 }
