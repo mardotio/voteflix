@@ -54,6 +54,14 @@ func Router(app *app.App) {
 
 		r.Route("/movies", func(r chi.Router) {
 			r.Post("/", moviesHandler.CreateMovie)
+
+			r.Route("/{movieId}", func(r chi.Router) {
+				r.Use(middleware.MovieCtx(app))
+
+				r.Route("/votes", func(r chi.Router) {
+					r.Put("/", moviesHandler.AddMovieVote)
+				})
+			})
 		})
 	})
 }

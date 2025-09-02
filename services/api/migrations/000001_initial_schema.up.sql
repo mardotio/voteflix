@@ -46,6 +46,8 @@ create table if not exists movies (
     list_id uuid not null,
     name varchar(255) not null,
     status varchar(15) not null,
+    approve_count integer default 0,
+    reject_count integer default 0,
     seed integer default gen_random_movie_seed(),
     creator_id uuid not null,
     created_at timestamp default current_timestamp,
@@ -54,7 +56,9 @@ create table if not exists movies (
     foreign key (list_id) references lists(id),
     foreign key (creator_id) references users(id),
 
-    constraint valid_status check (status in ('pending', 'approved', 'watched', 'rejected'))
+    constraint movies_valid_status check (status in ('pending', 'approved', 'watched', 'rejected')),
+    constraint movies_valid_approve_count check (approve_count > -1),
+    constraint movies_valid_reject_count check (reject_count > -1)
 );
 
 create table if not exists ratings (
