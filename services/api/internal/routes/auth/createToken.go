@@ -8,6 +8,7 @@ import (
 	"github.com/uptrace/bun"
 	"net/http"
 	"time"
+	"voteflix/api/internal/middleware"
 	"voteflix/api/internal/models"
 	"voteflix/api/internal/utils"
 )
@@ -156,7 +157,7 @@ func (h *Handler) CreateToken(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	db := h.app.Db()
 	jsonSender := utils.NewJsonSender(w, r)
-	botClaims := utils.GetBotClaimsFromCtx(ctx)
+	botClaims := middleware.GetBotClaimsFromCtx(ctx)
 
 	serverListId, serverListErr := getList(ctx, db, botClaims.Server)
 
@@ -191,6 +192,6 @@ func (h *Handler) CreateToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	claims := utils.UserJwtClaims{Sub: userId, Scope: serverListId}
-	token, tokenString, _ := h.app.JwtAuth().Encode(claims.ToClaimsMap(time.Hour * 1))
+	token, tokenString, _ := utils.GetAppToken(h.app, claims, time.Hour*1)
 	jsonSender.Created(createTokenResponse{Token: tokenString, ExpiresAt: utils.JsonEpochTime(token.Expiration())})
 }

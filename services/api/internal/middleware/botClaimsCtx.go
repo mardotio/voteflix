@@ -1,10 +1,23 @@
 package middleware
 
 import (
+	"context"
 	"github.com/go-chi/jwtauth/v5"
 	"net/http"
 	"voteflix/api/internal/utils"
 )
+
+type botCtxKey string
+
+const botClaimsCtx botCtxKey = "botClaims"
+
+func withBotClaimsCtx(ctx context.Context, claims utils.BotJwtClaims) context.Context {
+	return context.WithValue(ctx, botClaimsCtx, claims)
+}
+
+func GetBotClaimsFromCtx(ctx context.Context) utils.BotJwtClaims {
+	return ctx.Value(botClaimsCtx).(utils.BotJwtClaims)
+}
 
 func BotClaimsCtx() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -25,8 +38,7 @@ func BotClaimsCtx() func(http.Handler) http.Handler {
 				botClaims.Nickname = &nickname
 			}
 
-			ctx := botClaims.WithValue(r.Context())
-			next.ServeHTTP(w, r.WithContext(ctx))
+			next.ServeHTTP(w, r.WithContext(withBotClaimsCtx(r.Context(), botClaims)))
 		}
 
 		return http.HandlerFunc(handler)

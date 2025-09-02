@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 	"net/http"
+	"voteflix/api/internal/middleware"
 	"voteflix/api/internal/models"
 	"voteflix/api/internal/utils"
 )
@@ -33,7 +34,7 @@ func (h *Handler) CreateMovie(w http.ResponseWriter, r *http.Request) {
 	v := h.app.Validate()
 	jsonSender := utils.NewJsonSender(w, r)
 
-	userClaims := utils.GetUserClaimsFromCtx(ctx)
+	userClaims := middleware.GetUserClaimsFromCtx(ctx)
 	body := &createMovieRequest{validator: v}
 
 	if err := render.Bind(r, body); err != nil {

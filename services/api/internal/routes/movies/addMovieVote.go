@@ -118,7 +118,7 @@ func (h *Handler) AddMovieVote(w http.ResponseWriter, r *http.Request) {
 	db := h.app.Db()
 	jsonSender := utils.NewJsonSender(w, r)
 
-	userClaims := utils.GetUserClaimsFromCtx(ctx)
+	userClaims := middleware.GetUserClaimsFromCtx(ctx)
 	targetMovie := middleware.GetMovieFromCtx(ctx)
 	body := addMovieVoteRequest{validator: v}
 

@@ -1,21 +1,31 @@
 package utils
 
 import (
-	"context"
 	"github.com/go-chi/jwtauth/v5"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 	"time"
+	"voteflix/api/internal/app"
 )
 
-type userCtxKey string
+type AppToken interface {
+	toClaimsMap(duration time.Duration) map[string]interface{}
+	jwtAuth(app *app.App) *jwtauth.JWTAuth
+}
 
-const userClaimsCtx userCtxKey = "userClaims"
+func GetAppToken(app *app.App, token AppToken, duration time.Duration) (jwt.Token, string, error) {
+	return token.jwtAuth(app).Encode(token.toClaimsMap(duration))
+}
 
 type UserJwtClaims struct {
 	Sub   string
 	Scope string
 }
 
-func (claims UserJwtClaims) ToClaimsMap(duration time.Duration) map[string]interface{} {
+func (claims UserJwtClaims) jwtAuth(app *app.App) *jwtauth.JWTAuth {
+	return app.JwtAuth()
+}
+
+func (claims UserJwtClaims) toClaimsMap(duration time.Duration) map[string]interface{} {
 	claimsMap := map[string]interface{}{
 		"sub":   claims.Sub,
 		"scope": claims.Scope,
@@ -26,18 +36,6 @@ func (claims UserJwtClaims) ToClaimsMap(duration time.Duration) map[string]inter
 	return claimsMap
 }
 
-func (claims UserJwtClaims) WithValue(ctx context.Context) context.Context {
-	return context.WithValue(ctx, userClaimsCtx, claims)
-}
-
-func GetUserClaimsFromCtx(ctx context.Context) UserJwtClaims {
-	return ctx.Value(userClaimsCtx).(UserJwtClaims)
-}
-
-type botCtxKey string
-
-const botClaimsCtx botCtxKey = "botClaims"
-
 type BotJwtClaims struct {
 	Sub      string
 	Server   string
@@ -46,7 +44,11 @@ type BotJwtClaims struct {
 	Nickname *string
 }
 
-func (claims BotJwtClaims) ToClaimsMap(duration time.Duration) map[string]interface{} {
+func (claims BotJwtClaims) jwtAuth(app *app.App) *jwtauth.JWTAuth {
+	return app.BotJwtAuth()
+}
+
+func (claims BotJwtClaims) toClaimsMap(duration time.Duration) map[string]interface{} {
 	claimsMap := map[string]interface{}{
 		"sub":      claims.Sub,
 		"server":   claims.Server,
@@ -65,12 +67,4 @@ func (claims BotJwtClaims) ToClaimsMap(duration time.Duration) map[string]interf
 	jwtauth.SetExpiryIn(claimsMap, duration)
 
 	return claimsMap
-}
-
-func (claims BotJwtClaims) WithValue(ctx context.Context) context.Context {
-	return context.WithValue(ctx, botClaimsCtx, claims)
-}
-
-func GetBotClaimsFromCtx(ctx context.Context) BotJwtClaims {
-	return ctx.Value(botClaimsCtx).(BotJwtClaims)
 }

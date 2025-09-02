@@ -20,7 +20,7 @@ type movieCtxKey string
 
 const movieCtx movieCtxKey = "movie"
 
-func withValue(ctx context.Context, movie models.Movie) context.Context {
+func withMovieCtx(ctx context.Context, movie models.Movie) context.Context {
 	return context.WithValue(ctx, movieCtx, movie)
 }
 
@@ -36,7 +36,7 @@ func MovieCtx(app *app.App) func(http.Handler) http.Handler {
 			db := app.Db()
 			jsonSender := utils.NewJsonSender(w, r)
 
-			userClaims := utils.GetUserClaimsFromCtx(ctx)
+			userClaims := GetUserClaimsFromCtx(ctx)
 			params := moviePathParams{
 				MovieId: chi.URLParam(r, "movieId"),
 			}
@@ -63,7 +63,7 @@ func MovieCtx(app *app.App) func(http.Handler) http.Handler {
 				return
 			}
 
-			next.ServeHTTP(w, r.WithContext(withValue(ctx, movie)))
+			next.ServeHTTP(w, r.WithContext(withMovieCtx(ctx, movie)))
 		}
 
 		return http.HandlerFunc(handler)
