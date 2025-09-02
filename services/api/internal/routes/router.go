@@ -58,6 +58,8 @@ func Router(app *app.App) {
 			r.Route("/{movieId}", func(r chi.Router) {
 				r.Use(middleware.MovieCtx(app))
 
+				r.Patch("/", moviesHandler.UpdateMovie)
+
 				r.Route("/votes", func(r chi.Router) {
 					r.Put("/", moviesHandler.AddMovieVote)
 				})
