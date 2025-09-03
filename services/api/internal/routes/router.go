@@ -63,6 +63,10 @@ func Router(app *app.App) {
 				r.Route("/votes", func(r chi.Router) {
 					r.Put("/", moviesHandler.AddMovieVote)
 				})
+
+				r.Route("/ratings", func(r chi.Router) {
+					r.Put("/", moviesHandler.AddMovieRating)
+				})
 			})
 		})
 	})
