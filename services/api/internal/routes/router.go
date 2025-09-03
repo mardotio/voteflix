@@ -54,6 +54,7 @@ func Router(app *app.App) {
 
 		r.Route("/movies", func(r chi.Router) {
 			r.Post("/", moviesHandler.CreateMovie)
+			r.Get("/", moviesHandler.ListMovies)
 
 			r.Route("/{movieId}", func(r chi.Router) {
 				r.Use(middleware.MovieCtx(app))
