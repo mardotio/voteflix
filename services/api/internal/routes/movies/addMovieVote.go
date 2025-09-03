@@ -15,7 +15,7 @@ import (
 	"voteflix/api/internal/utils"
 )
 
-const statusThreshold = 2
+const statusThreshold = 1
 
 type addMovieVoteRequest struct {
 	Approve *bool `json:"approve" validate:"boolean,required"`
@@ -95,7 +95,7 @@ func updateMovieCounts(ctx context.Context, tx bun.Tx, movie models.Movie, vote 
 	if rejectCount >= statusThreshold {
 		status = "rejected"
 	} else if approveCount >= statusThreshold {
-		status = "accepted"
+		status = "approved"
 	}
 
 	_, err := tx.NewUpdate().
