@@ -23,11 +23,7 @@ type listMovieDetails struct {
 	UpdatedAt *utils.JsonEpochTime `json:"updatedAt"`
 }
 
-type listMoviesResponse struct {
-	Data []listMovieDetails `json:"data"`
-}
-
-func (body listMoviesResponse) Render(w http.ResponseWriter, r *http.Request) error { return nil }
+func (r listMovieDetails) CursorId() *string { return &r.Id }
 
 type movieWithUser struct {
 	models.Movie
@@ -36,20 +32,35 @@ type movieWithUser struct {
 	DiscordUsername string
 }
 
-func listMovies(ctx context.Context, db *bun.DB, claims utils.UserJwtClaims) ([]movieWithUser, error) {
+func listMovies(ctx context.Context, db *bun.DB, claims utils.UserJwtClaims, cursor utils.Cursor[listMovieDetails]) ([]movieWithUser, error) {
 	var movies []movieWithUser
+
+	cursorOrder := cursor.Order()
 
 	moviesSubQuery := db.NewSelect().
 		Model((*models.Movie)(nil)).
 		Where("list_id = ?", claims.Scope).
-		Limit(10)
+		OrderExpr("? ?", bun.Ident("created_at"), cursorOrder).
+		OrderExpr("? ?", bun.Ident("id"), cursorOrder).
+		Limit(cursor.FetchLimit())
+
+	if !cursor.IsStart() {
+		subQuery := db.NewSelect().
+			Model((*models.Movie)(nil)).
+			Column("created_at").
+			Where("list_id = ?", claims.Scope).
+			Where("id = ?", *cursor.Marker())
+
+		moviesSubQuery.
+			Where("(created_at, id) ? ((?), ?)", cursor.Comparator(), subQuery, *cursor.Marker())
+	}
 
 	err := db.NewSelect().
 		TableExpr("(?) AS movie", moviesSubQuery).
 		Column("movie.*", "c.discord_nickname", "u.discord_avatar_id", "u.discord_username").
 		Join("join list_users as c").
 		JoinOn("c.user_id = movie.creator_id").
-		JoinOn("c.list_id = movie.list_id").
+		JoinOn("c.list_id = ?", claims.Scope).
 		Join("join users as u").
 		JoinOn("u.id = movie.creator_id").
 		Scan(ctx, &movies)
@@ -57,8 +68,8 @@ func listMovies(ctx context.Context, db *bun.DB, claims utils.UserJwtClaims) ([]
 	return movies, err
 }
 
-func toListMoviesResponse(movies []movieWithUser) listMoviesResponse {
-	response := make([]listMovieDetails, len(movies))
+func toMovieDetails(movies []movieWithUser) []listMovieDetails {
+	data := make([]listMovieDetails, len(movies))
 
 	for i, m := range movies {
 		creator := listMovieCreator{
@@ -70,7 +81,7 @@ func toListMoviesResponse(movies []movieWithUser) listMoviesResponse {
 			creator.Name = *m.DiscordNickname
 		}
 
-		response[i] = listMovieDetails{
+		data[i] = listMovieDetails{
 			Id:        m.Id,
 			Name:      m.Name,
 			Status:    m.Status,
@@ -80,22 +91,29 @@ func toListMoviesResponse(movies []movieWithUser) listMoviesResponse {
 		}
 	}
 
-	return listMoviesResponse{Data: response}
+	return data
 }
 
 func (h *Handler) ListMovies(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	db := h.app.Db()
+	v := h.app.Validate()
 	jsonSender := utils.NewJsonSender(w, r)
 
 	userClaims := middleware.GetUserClaimsFromCtx(ctx)
+	cursor, cursorErr := utils.NewCursorFromMap[listMovieDetails](r.URL.Query(), v)
 
-	movies, moviesErr := listMovies(ctx, db, userClaims)
+	if cursorErr != nil {
+		jsonSender.BadRequest(cursorErr)
+		return
+	}
+
+	movies, moviesErr := listMovies(ctx, db, userClaims, cursor)
 
 	if moviesErr != nil {
 		jsonSender.InternalServerError(moviesErr)
 		return
 	}
 
-	jsonSender.Ok(toListMoviesResponse(movies))
+	jsonSender.Ok(cursor.WithData(toMovieDetails(movies)).ToResponse())
 }
