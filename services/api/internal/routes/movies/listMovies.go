@@ -2,12 +2,26 @@ package movies
 
 import (
 	"context"
+	"github.com/go-playground/validator/v10"
 	"github.com/uptrace/bun"
 	"net/http"
+	"net/url"
 	"voteflix/api/internal/middleware"
 	"voteflix/api/internal/models"
 	"voteflix/api/internal/utils"
 )
+
+type listMoviesQueryParams struct {
+	Status string `validate:"omitempty,oneof=pending approved watched rejected"`
+}
+
+func getListMoviesQueryParams(values url.Values, validate *validator.Validate) (listMoviesQueryParams, error) {
+	params := listMoviesQueryParams{Status: values.Get("status")}
+
+	err := validate.Struct(&params)
+
+	return params, err
+}
 
 type listMovieCreator struct {
 	Name      string  `json:"name"`
@@ -32,7 +46,13 @@ type movieWithUser struct {
 	DiscordUsername string
 }
 
-func listMovies(ctx context.Context, db *bun.DB, claims utils.UserJwtClaims, cursor utils.Cursor[listMovieDetails]) ([]movieWithUser, error) {
+func listMovies(
+	ctx context.Context,
+	db *bun.DB,
+	claims utils.UserJwtClaims,
+	cursor utils.Cursor[listMovieDetails],
+	queryParams listMoviesQueryParams,
+) ([]movieWithUser, error) {
 	var movies []movieWithUser
 
 	cursorOrder := cursor.Order()
@@ -43,6 +63,10 @@ func listMovies(ctx context.Context, db *bun.DB, claims utils.UserJwtClaims, cur
 		OrderExpr("? ?", bun.Ident("created_at"), cursorOrder).
 		OrderExpr("? ?", bun.Ident("id"), cursorOrder).
 		Limit(cursor.FetchLimit())
+
+	if queryParams.Status != "" {
+		moviesSubQuery.Where("status = ?", queryParams.Status)
+	}
 
 	if !cursor.IsStart() {
 		subQuery := db.NewSelect().
@@ -101,6 +125,13 @@ func (h *Handler) ListMovies(w http.ResponseWriter, r *http.Request) {
 	jsonSender := utils.NewJsonSender(w, r)
 
 	userClaims := middleware.GetUserClaimsFromCtx(ctx)
+	queryParams, queryParamsErr := getListMoviesQueryParams(r.URL.Query(), v)
+
+	if queryParamsErr != nil {
+		jsonSender.BadRequest(queryParamsErr)
+		return
+	}
+
 	cursor, cursorErr := utils.NewCursorFromMap[listMovieDetails](r.URL.Query(), v)
 
 	if cursorErr != nil {
@@ -108,7 +139,7 @@ func (h *Handler) ListMovies(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	movies, moviesErr := listMovies(ctx, db, userClaims, cursor)
+	movies, moviesErr := listMovies(ctx, db, userClaims, cursor, queryParams)
 
 	if moviesErr != nil {
 		jsonSender.InternalServerError(moviesErr)
