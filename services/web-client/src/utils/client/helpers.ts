@@ -1,4 +1,6 @@
-import type { ApiErrorData } from "./apiFetch";
+import { ApiError, type ApiErrorData } from "./apiFetch";
+
+export const isApiError = (e: unknown): e is ApiError => e instanceof ApiError;
 
 export const isErrorResponse = <T, K = Exclude<T, ApiErrorData>>(
   response: K | ApiErrorData,
@@ -19,4 +21,4 @@ export const isErrorResponse = <T, K = Exclude<T, ApiErrorData>>(
 
 export const isSuccessResponse = <T, K = Exclude<T, ApiErrorData>>(
   response: K | ApiErrorData,
-): response is K => !isErrorResponse(response);
+): response is K => response && !isErrorResponse(response);

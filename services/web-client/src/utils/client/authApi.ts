@@ -1,3 +1,4 @@
+import { ApiConfig } from "./apiConfig";
 import { ApiFetch } from "./apiFetch";
 
 export interface TokenResponse {
@@ -6,10 +7,15 @@ export interface TokenResponse {
 }
 
 export const authApi = {
-  create: (loginToken: string) =>
-    ApiFetch.fetch<TokenResponse>({
+  create: async (loginToken: string) => {
+    const res = await ApiFetch.fetch<TokenResponse>({
       method: "POST",
       route: "/api/auth/token",
       headers: { Authorization: `Bearer ${loginToken}` },
-    }),
+    });
+    ApiConfig.setToken(res.token);
+    sessionStorage.setItem("token", res.token);
+
+    return res;
+  },
 };

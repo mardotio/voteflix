@@ -7,6 +7,15 @@ export interface ApiErrorData {
   body: any;
 }
 
+export class ApiError extends Error {
+  body: ApiErrorData;
+
+  constructor(e: ApiErrorData) {
+    super(`${e.status}: ${e.statusText}`);
+    this.body = e;
+  }
+}
+
 export class ApiFetch {
   static async generateError(
     response: Response,
@@ -40,21 +49,19 @@ export class ApiFetch {
     const response = await fetch(this.getEndpoint(route), {
       method,
       headers: {
-        ...(ApiConfig.headers || {}),
+        ...ApiConfig.getHeaders(),
         "content-type": "application/json",
         ...headers,
       },
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    console.log({ response });
-
     if (!response.ok) {
       const errorResponse = await this.generateError(
         response,
         !response.headers.get("content-type")?.includes("application/json"),
       );
-      return errorResponse;
+      return Promise.reject(new ApiError(errorResponse));
     }
 
     if (response.status === 204) {
