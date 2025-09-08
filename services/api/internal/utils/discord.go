@@ -2,15 +2,14 @@ package utils
 
 import (
 	"fmt"
-	"voteflix/api/internal/models"
 )
 
-func GetAvatarUrl(user models.User) *string {
-	if user.DiscordAvatarId == nil {
+func GetAvatarUrl(discordUserId string, avatarId *string) *string {
+	if avatarId == nil {
 		return nil
 	}
 
-	url := fmt.Sprintf("https://cdn.discordapp.com/avatars/%s/%s.png", user.DiscordId, *user.DiscordAvatarId)
+	url := fmt.Sprintf("https://cdn.discordapp.com/avatars/%s/%s.png", discordUserId, *avatarId)
 
 	return &url
 }

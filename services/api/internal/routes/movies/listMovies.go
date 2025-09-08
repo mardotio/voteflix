@@ -44,6 +44,7 @@ type movieWithUser struct {
 	DiscordNickname *string
 	DiscordAvatarId *string
 	DiscordUsername string
+	DiscordId       string
 }
 
 func listMovies(
@@ -81,7 +82,7 @@ func listMovies(
 
 	err := db.NewSelect().
 		TableExpr("(?) AS movie", moviesSubQuery).
-		Column("movie.*", "c.discord_nickname", "u.discord_avatar_id", "u.discord_username").
+		Column("movie.*", "c.discord_nickname", "u.discord_avatar_id", "u.discord_username", "u.discord_id").
 		Join("join list_users as c").
 		JoinOn("c.user_id = movie.creator_id").
 		JoinOn("c.list_id = ?", claims.Scope).
@@ -98,7 +99,7 @@ func toMovieDetails(movies []movieWithUser) []listMovieDetails {
 	for i, m := range movies {
 		creator := listMovieCreator{
 			Name:      m.DiscordUsername,
-			AvatarUrl: utils.GetAvatarUrl(models.User{DiscordAvatarId: m.DiscordAvatarId}),
+			AvatarUrl: utils.GetAvatarUrl(m.DiscordId, m.DiscordAvatarId),
 		}
 
 		if m.DiscordNickname != nil {
