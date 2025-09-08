@@ -40,21 +40,27 @@ export class ApiFetch {
     method,
     headers = {},
     body,
+    searchParams = {},
   }: {
     route: string;
     method: Request["method"];
     body?: Body;
     headers?: Record<string, string>;
+    searchParams?: Record<string, string>;
   }) {
-    const response = await fetch(this.getEndpoint(route), {
-      method,
-      headers: {
-        ...ApiConfig.getHeaders(),
-        "content-type": "application/json",
-        ...headers,
+    const queryString = new URLSearchParams(searchParams);
+    const response = await fetch(
+      `${this.getEndpoint(route)}${queryString ? `?${queryString}` : ""}`,
+      {
+        method,
+        headers: {
+          ...ApiConfig.getHeaders(),
+          "content-type": "application/json",
+          ...headers,
+        },
+        body: body ? JSON.stringify(body) : undefined,
       },
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    );
 
     if (!response.ok) {
       const errorResponse = await this.generateError(

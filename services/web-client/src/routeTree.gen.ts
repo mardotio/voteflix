@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LoggedInLayoutRouteImport } from './routes/_loggedInLayout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoggedInLayoutServerIdIndexRouteImport } from './routes/_loggedInLayout/$serverId/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoggedInLayoutRoute = LoggedInLayoutRouteImport.update({
+  id: '/_loggedInLayout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,30 +28,46 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoggedInLayoutServerIdIndexRoute =
+  LoggedInLayoutServerIdIndexRouteImport.update({
+    id: '/$serverId/',
+    path: '/$serverId/',
+    getParentRoute: () => LoggedInLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/$serverId': typeof LoggedInLayoutServerIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/$serverId': typeof LoggedInLayoutServerIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_loggedInLayout': typeof LoggedInLayoutRouteWithChildren
   '/login': typeof LoginRoute
+  '/_loggedInLayout/$serverId/': typeof LoggedInLayoutServerIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths: '/' | '/login' | '/$serverId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login'
+  to: '/' | '/login' | '/$serverId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_loggedInLayout'
+    | '/login'
+    | '/_loggedInLayout/$serverId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoggedInLayoutRoute: typeof LoggedInLayoutRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -58,6 +80,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_loggedInLayout': {
+      id: '/_loggedInLayout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LoggedInLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +94,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_loggedInLayout/$serverId/': {
+      id: '/_loggedInLayout/$serverId/'
+      path: '/$serverId'
+      fullPath: '/$serverId'
+      preLoaderRoute: typeof LoggedInLayoutServerIdIndexRouteImport
+      parentRoute: typeof LoggedInLayoutRoute
+    }
   }
 }
 
+interface LoggedInLayoutRouteChildren {
+  LoggedInLayoutServerIdIndexRoute: typeof LoggedInLayoutServerIdIndexRoute
+}
+
+const LoggedInLayoutRouteChildren: LoggedInLayoutRouteChildren = {
+  LoggedInLayoutServerIdIndexRoute: LoggedInLayoutServerIdIndexRoute,
+}
+
+const LoggedInLayoutRouteWithChildren = LoggedInLayoutRoute._addFileChildren(
+  LoggedInLayoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoggedInLayoutRoute: LoggedInLayoutRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport

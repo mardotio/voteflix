@@ -1,0 +1,21 @@
+.wrapper {
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--theme-secondary);
+  color: var(--theme-bg);
+
+  @each $size in (12, 24, 36, 48) {
+    &.size-#{$size} {
+      width: #{$size}px;
+      height: #{$size}px;
+    }
+  }
+
+  > img {
+    height: 100%;
+    width: 100%;
+  }
+}

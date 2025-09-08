@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Navigate, createFileRoute, useSearch } from "@tanstack/react-router";
 
+import { useCurrentUserContext } from "../hooks/useCurrentUser";
 import { ApiConfig, authApi, isApiError, usersApi } from "../utils/client";
 
 interface LoginLayoutSearchParams {
@@ -8,6 +9,7 @@ interface LoginLayoutSearchParams {
 }
 
 const LoginLayout = () => {
+  const { setCurrentUser } = useCurrentUserContext();
   const { t: token } = useSearch({ from: "/login" });
   const { data, status, error } = useQuery({
     queryFn: async () => {
@@ -19,7 +21,9 @@ const LoginLayout = () => {
         await authApi.create(token);
       }
 
-      return await usersApi.whoAmI();
+      const res = await usersApi.whoAmI();
+      setCurrentUser(res);
+      return res;
     },
     queryKey: ["login", { token }],
     retry: false,
@@ -30,7 +34,9 @@ const LoginLayout = () => {
   }
 
   if (data) {
-    return <Navigate to="/" replace />;
+    return (
+      <Navigate to="/$serverId" params={{ serverId: data.list.id }} replace />
+    );
   }
 
   if (!token) {
