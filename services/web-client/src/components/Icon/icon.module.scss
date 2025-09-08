@@ -1,0 +1,8 @@
+.icon {
+  @each $size in (12, 24, 36, 48) {
+    &-#{size} {
+      height: #{size}px;
+      width: #{size}px;
+    }
+  }
+}

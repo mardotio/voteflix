@@ -1,22 +1,5 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-
-import { ApiConfig } from "../utils/client";
+import { Navigate, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  component: Index,
-  beforeLoad: () => {
-    if (!ApiConfig.hasToken()) {
-      throw redirect({
-        to: "/login",
-      });
-    }
-  },
+  component: () => <Navigate to="/login" />,
 });
-
-function Index() {
-  return (
-    <div className="p-2">
-      <h3>Welcome Home!</h3>
-    </div>
-  );
-}
