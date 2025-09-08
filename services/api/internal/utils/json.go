@@ -8,7 +8,7 @@ import (
 type JsonEpochTime time.Time
 
 func (t JsonEpochTime) TimestampString() string {
-	return strconv.FormatInt(time.Time(t).Unix(), 10)
+	return strconv.FormatInt(time.Time(t).UnixMilli(), 10)
 }
 
 func (t JsonEpochTime) MarshalJSON() ([]byte, error) {

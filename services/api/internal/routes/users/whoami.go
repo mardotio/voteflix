@@ -50,7 +50,7 @@ func (h *Handler) WhoAmI(w http.ResponseWriter, r *http.Request) {
 			Name:     user.List.Name,
 			ServerId: user.List.DiscordServerId,
 		},
-		AvatarUrl:   utils.GetAvatarUrl(*user.User),
+		AvatarUrl:   utils.GetAvatarUrl(user.User.DiscordId, user.User.DiscordAvatarId),
 		DisplayName: user.User.DiscordUsername,
 	}
 

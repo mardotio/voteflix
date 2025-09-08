@@ -162,7 +162,7 @@ func (h *Handler) CreateToken(w http.ResponseWriter, r *http.Request) {
 	serverListId, serverListErr := getList(ctx, db, botClaims.Server)
 
 	if serverListErr != nil {
-		jsonSender.NotFound(fmt.Errorf("could not find list assocaited with server %s", botClaims.Server))
+		jsonSender.NotFound(fmt.Errorf("could not find list associated with server %s", botClaims.Server))
 		return
 	}
 
