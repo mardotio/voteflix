@@ -13,6 +13,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LoggedInLayoutRouteImport } from './routes/_loggedInLayout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoggedInLayoutServerIdIndexRouteImport } from './routes/_loggedInLayout/$serverId/index'
+import { Route as LoggedInLayoutServerIdSearchRouteImport } from './routes/_loggedInLayout/$serverId/search'
+import { Route as LoggedInLayoutServerIdMoviesRouteImport } from './routes/_loggedInLayout/$serverId/movies'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -34,15 +36,31 @@ const LoggedInLayoutServerIdIndexRoute =
     path: '/$serverId/',
     getParentRoute: () => LoggedInLayoutRoute,
   } as any)
+const LoggedInLayoutServerIdSearchRoute =
+  LoggedInLayoutServerIdSearchRouteImport.update({
+    id: '/$serverId/search',
+    path: '/$serverId/search',
+    getParentRoute: () => LoggedInLayoutRoute,
+  } as any)
+const LoggedInLayoutServerIdMoviesRoute =
+  LoggedInLayoutServerIdMoviesRouteImport.update({
+    id: '/$serverId/movies',
+    path: '/$serverId/movies',
+    getParentRoute: () => LoggedInLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/$serverId/movies': typeof LoggedInLayoutServerIdMoviesRoute
+  '/$serverId/search': typeof LoggedInLayoutServerIdSearchRoute
   '/$serverId': typeof LoggedInLayoutServerIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/$serverId/movies': typeof LoggedInLayoutServerIdMoviesRoute
+  '/$serverId/search': typeof LoggedInLayoutServerIdSearchRoute
   '/$serverId': typeof LoggedInLayoutServerIdIndexRoute
 }
 export interface FileRoutesById {
@@ -50,18 +68,27 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_loggedInLayout': typeof LoggedInLayoutRouteWithChildren
   '/login': typeof LoginRoute
+  '/_loggedInLayout/$serverId/movies': typeof LoggedInLayoutServerIdMoviesRoute
+  '/_loggedInLayout/$serverId/search': typeof LoggedInLayoutServerIdSearchRoute
   '/_loggedInLayout/$serverId/': typeof LoggedInLayoutServerIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/$serverId'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/$serverId/movies'
+    | '/$serverId/search'
+    | '/$serverId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/$serverId'
+  to: '/' | '/login' | '/$serverId/movies' | '/$serverId/search' | '/$serverId'
   id:
     | '__root__'
     | '/'
     | '/_loggedInLayout'
     | '/login'
+    | '/_loggedInLayout/$serverId/movies'
+    | '/_loggedInLayout/$serverId/search'
     | '/_loggedInLayout/$serverId/'
   fileRoutesById: FileRoutesById
 }
@@ -101,14 +128,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoggedInLayoutServerIdIndexRouteImport
       parentRoute: typeof LoggedInLayoutRoute
     }
+    '/_loggedInLayout/$serverId/search': {
+      id: '/_loggedInLayout/$serverId/search'
+      path: '/$serverId/search'
+      fullPath: '/$serverId/search'
+      preLoaderRoute: typeof LoggedInLayoutServerIdSearchRouteImport
+      parentRoute: typeof LoggedInLayoutRoute
+    }
+    '/_loggedInLayout/$serverId/movies': {
+      id: '/_loggedInLayout/$serverId/movies'
+      path: '/$serverId/movies'
+      fullPath: '/$serverId/movies'
+      preLoaderRoute: typeof LoggedInLayoutServerIdMoviesRouteImport
+      parentRoute: typeof LoggedInLayoutRoute
+    }
   }
 }
 
 interface LoggedInLayoutRouteChildren {
+  LoggedInLayoutServerIdMoviesRoute: typeof LoggedInLayoutServerIdMoviesRoute
+  LoggedInLayoutServerIdSearchRoute: typeof LoggedInLayoutServerIdSearchRoute
   LoggedInLayoutServerIdIndexRoute: typeof LoggedInLayoutServerIdIndexRoute
 }
 
 const LoggedInLayoutRouteChildren: LoggedInLayoutRouteChildren = {
+  LoggedInLayoutServerIdMoviesRoute: LoggedInLayoutServerIdMoviesRoute,
+  LoggedInLayoutServerIdSearchRoute: LoggedInLayoutServerIdSearchRoute,
   LoggedInLayoutServerIdIndexRoute: LoggedInLayoutServerIdIndexRoute,
 }
 

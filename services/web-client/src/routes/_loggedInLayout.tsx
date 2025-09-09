@@ -22,15 +22,20 @@ function RouteComponent() {
 
   return (
     <div className={styles.content}>
-      <div className={styles["header-outer"]}>
-        <div className={styles.header}>
-          <Avatar name={currentUser.displayName} src={currentUser.avatarUrl} />
-          <h3>{currentUser.list.name.toLocaleUpperCase()}</h3>
+      <div className={styles.body}>
+        <div className={styles["header-outer"]}>
+          <div className={styles.header}>
+            <Avatar
+              name={currentUser.displayName}
+              src={currentUser.avatarUrl}
+            />
+            <h3>{currentUser.list.name.toLocaleUpperCase()}</h3>
+          </div>
         </div>
-      </div>
 
-      <div className={styles["page-content"]}>
-        <Outlet />
+        <div className={styles["page-content"]}>
+          <Outlet />
+        </div>
       </div>
 
       <NavBar />
