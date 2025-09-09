@@ -1,0 +1,51 @@
+@import url("https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap");
+
+:root {
+  --theme-bg: rgb(17, 17, 17);
+  --theme-bg-90: rgb(29, 29, 29);
+  --theme-bg-80: #292929;
+  --theme-primary: #0c8be8;
+  --theme-secondary: #5b8fb9;
+  --theme-ui: ghostwhite;
+
+  @media (prefers-color-scheme: light) {
+    --theme-bg: ghostwhite;
+    --theme-primary: #0c8be8;
+    --theme-secondary: #5b8fb9;
+    --theme-ui: #03001c;
+  }
+
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: var(--theme-ui);
+  background-color: var(--theme-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Sometype Mono", monospace;
+}
+
+body {
+  height: 100dvh;
+  min-height: 100dvh;
+
+  #root {
+    height: 100%;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}

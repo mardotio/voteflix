@@ -1,24 +1,49 @@
 .main {
-  position: sticky;
+  position: absolute;
   bottom: 0;
   left: 0;
   display: flex;
   justify-content: center;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .navigation {
-  padding: 12px;
-  border-radius: 8px 8px 0 0;
+  padding: 0 12px;
+  border-radius: 24px 24px 0 0;
   display: flex;
+  align-items: center;
+  justify-content: space-around;
   width: 100%;
   gap: 8px;
-  justify-content: center;
   background-color: rgb(35 35 35 / 0.5);
   border-top: 1px solid var(--theme-bg-80);
   backdrop-filter: blur(5px);
 
   > li {
-    padding: 4px;
     border-radius: 8px;
+  }
+}
+
+.main-button {
+  position: relative;
+  top: -10px;
+
+  button {
+    background-color: var(--theme-primary);
+    outline: none;
+    border: 0;
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px 3px rgb(from var(--theme-primary) r g b / 0.5);
+    transition: transform ease 100ms;
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.9);
+    }
   }
 }

@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import { useCurrentUser } from "../../hooks/useCurrentUser";
-import { MovieIcon } from "../Icon";
-import { MovieIconFilled } from "../Icon/MovieIconFilled";
+import { HomeIcon, MagnifyingGlassIcon, PlusSquareIcon } from "../Icon";
 import styles from "./NavBar.module.scss";
 
 export const NavBar = () => {
@@ -10,18 +9,41 @@ export const NavBar = () => {
   return (
     <nav className={styles.main}>
       <ul className={styles.navigation}>
-        <li className={styles.selected}>
-          <Link to="/$serverId" params={{ serverId: currentUser.list.id }}>
+        <li>
+          <Link
+            to="/$serverId/movies"
+            params={{ serverId: currentUser.list.id }}
+          >
             {(p) => {
-              if (p.isActive) {
-                return <MovieIconFilled />;
-              }
-              return <MovieIcon />;
+              return (
+                <HomeIcon
+                  size={24}
+                  iconStyle={p.isActive ? "solid" : "outline"}
+                />
+              );
             }}
           </Link>
         </li>
-        <li>Home</li>
-        <li>Home</li>
+        <li className={styles["main-button"]}>
+          <button>
+            <PlusSquareIcon />
+          </button>
+        </li>
+        <li>
+          <Link
+            to="/$serverId/search"
+            params={{ serverId: currentUser.list.id }}
+          >
+            {(p) => {
+              return (
+                <MagnifyingGlassIcon
+                  size={24}
+                  iconStyle={p.isActive ? "solid" : "outline"}
+                />
+              );
+            }}
+          </Link>
+        </li>
       </ul>
     </nav>
   );
