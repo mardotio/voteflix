@@ -48,7 +48,16 @@ export class ApiFetch {
     headers?: Record<string, string>;
     searchParams?: Record<string, string>;
   }) {
-    const queryString = new URLSearchParams(searchParams);
+    const queryString = new URLSearchParams(
+      Object.entries(searchParams).reduce((withoutEmpty, [key, value]) => {
+        if (value === undefined) {
+          return withoutEmpty;
+        }
+
+        return { ...withoutEmpty, [key]: value };
+      }, {}),
+    );
+
     const response = await fetch(
       `${this.getEndpoint(route)}${queryString ? `?${queryString}` : ""}`,
       {

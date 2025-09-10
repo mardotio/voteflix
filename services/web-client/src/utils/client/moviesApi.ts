@@ -1,9 +1,11 @@
 import { ApiFetch } from "./apiFetch";
 
+export type MovieStatus = "watched" | "approved" | "rejected" | "pending";
+
 export interface ListMoviesRequest {
   direction: "asc" | "desc";
   limit: number;
-  status?: "watched" | "approved" | "rejected" | "pending";
+  status?: MovieStatus;
   before?: string;
   after?: string;
 }
@@ -11,7 +13,7 @@ export interface ListMoviesRequest {
 export interface Movie {
   id: string;
   name: string;
-  status: "watcged" | "approved" | "rejected" | "pending";
+  status: MovieStatus;
   creator: {
     name: string;
     avatarUrl: string | null;

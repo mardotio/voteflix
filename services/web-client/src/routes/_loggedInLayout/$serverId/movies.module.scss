@@ -1,50 +1,79 @@
-.movie {
-  &:not(:last-child) {
-    margin-bottom: 8px;
+.status-selector {
+  padding: 8px 0;
+  display: inline-flex;
+  align-items: center;
+
+  svg {
+    transition: transform ease 100ms;
   }
 
-  > div {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--theme-bg-90);
-    border-radius: 8px;
-    padding: 12px;
-    gap: 4px;
+  &:has(select:open) {
+    svg {
+      transform: scale(1, -1);
+    }
+  }
+
+  > select {
+    appearance: none;
+    background-color: transparent;
+    border: 0;
+    outline: 0;
+    color: var(--theme-ui);
+    font-size: 20px;
+    font-weight: 600;
+    width: 100%;
+
+    > option {
+      font-size: 12px;
+      text-transform: capitalize;
+      color: green;
+    }
+
+    control-label {
+      background-color: green;
+    }
   }
 }
 
-.header {
+.list-options {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-}
-
-.creator {
-  display: flex;
   align-items: center;
-  gap: 4px;
+  margin-bottom: 12px;
 
-  > p {
-    font-size: 12px;
-    color: rgb(from var(--theme-ui) r g b / 50%);
+  > button {
+    padding: 8px;
+    background-color: transparent;
+    border: none;
+    transition: transform ease 100ms;
+
+    &.dir-desc {
+      transform: scale(1, -1);
+    }
+
+    &:active {
+      transform: scale(0.9);
+    }
   }
 }
 
-.status {
-  font-size: 12px;
-  background-color: var(--theme-bg-80);
-  padding: 8px;
-  border-radius: 8px;
-  color: rgb(from var(--theme-ui) r g b / 50%);
-}
+.load-button {
+  display: flex;
+  justify-content: center;
 
-.name {
-  font-size: 24px;
-  margin-top: 8px;
-  margin-bottom: 24px;
-}
+  > button {
+    color: var(--theme-primary);
+    border: 2px solid var(--theme-primary);
+    border-radius: 8px;
+    padding: 8px;
+    background-color: transparent;
+    margin-top: 12px;
+    font-weight: 600;
+    transition: transform ease 100ms;
+    cursor: pointer;
 
-.date {
-  font-size: 12px;
-  color: rgb(from var(--theme-ui) r g b / 50%);
+    &:active {
+      transform: scale(0.9);
+    }
+  }
 }
