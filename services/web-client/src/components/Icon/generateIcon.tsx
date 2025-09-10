@@ -33,7 +33,7 @@ export type IconProps<
   /** The CSS `fill` color for the icon. */
   fill?: string;
   /** The icon size in pixels. */
-  size?: 32 | 24 | 20 | 16 | 12;
+  size?: 12 | 16 | 20 | 24 | 32 | 36 | 48;
 } & Omit<ComponentPropsWithRef<"svg">, "stroke">;
 
 interface GenerateIconOptions<F extends IconData, O extends IconData> {
@@ -64,17 +64,18 @@ export const generateIcon = <
     const iS = iconStyle ? iconStyle : outlineSvg ? "outline" : "solid";
 
     return (
-      <svg
-        className={`${styles[`icon-${size}`]} ${className}`}
-        xmlns="http://www.w3.org/2000/svg"
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill={fill}
-        {...svgProps}
+      <span
+        className={`${styles.icon} ${styles[`icon-${size}`]} ${className ?? ""}`}
       >
-        {iS === "solid" ? filledSvg : outlineSvg}
-      </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill={fill}
+          {...svgProps}
+        >
+          {iS === "solid" ? filledSvg : outlineSvg}
+        </svg>
+      </span>
     );
   };
 

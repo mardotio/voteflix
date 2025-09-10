@@ -1,0 +1,50 @@
+.movie {
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--theme-bg-90);
+    border-radius: 8px;
+    padding: 12px;
+    gap: 4px;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.creator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  > p {
+    font-size: 12px;
+    color: rgb(from var(--theme-ui) r g b / 50%);
+  }
+}
+
+.status {
+  font-size: 12px;
+  background-color: var(--theme-bg-80);
+  padding: 8px;
+  border-radius: 8px;
+  color: rgb(from var(--theme-ui) r g b / 50%);
+}
+
+.name {
+  font-size: 24px;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.date {
+  font-size: 12px;
+  color: rgb(from var(--theme-ui) r g b / 50%);
+}
