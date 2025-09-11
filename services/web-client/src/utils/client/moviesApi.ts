@@ -28,11 +28,29 @@ export interface ListMoviesResponse {
   previous: string | null;
 }
 
+export interface CreateMovieResponse {
+  id: string;
+  listId: string;
+  name: string;
+  status: string;
+  createdAt: number;
+}
+
+export interface CreateMovieRequest {
+  name: string;
+}
+
 export const moviesApi = {
   listMovies: (options: ListMoviesRequest) =>
     ApiFetch.fetch<ListMoviesResponse>({
       method: "GET",
       route: "/api/movies",
       searchParams: options as unknown as Record<string, string>,
+    }),
+  createMovie: (body: CreateMovieRequest) =>
+    ApiFetch.fetch<CreateMovieResponse, CreateMovieRequest>({
+      method: "POST",
+      route: "/api/movies",
+      body,
     }),
 };
