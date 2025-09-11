@@ -28,10 +28,6 @@
       text-transform: capitalize;
       color: green;
     }
-
-    control-label {
-      background-color: green;
-    }
   }
 }
 
@@ -44,7 +40,7 @@
   > button {
     padding: 8px;
     background-color: transparent;
-    border: none;
+    border: 0;
     transition: transform ease 100ms;
 
     &.dir-desc {

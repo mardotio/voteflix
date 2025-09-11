@@ -16,12 +16,13 @@ interface MovieCardProps {
     };
     createdAt: number;
   };
+  onClick: () => void;
 }
 
-export const MovieCard = ({ movie }: MovieCardProps) => {
+export const MovieCard = ({ movie, onClick }: MovieCardProps) => {
   return (
     <li className={styles.movie}>
-      <div>
+      <button onClick={onClick}>
         <div className={styles.header}>
           <div className={styles.creator}>
             <Avatar
@@ -35,7 +36,7 @@ export const MovieCard = ({ movie }: MovieCardProps) => {
         </div>
         <h6 className={styles.name}>{movie.name}</h6>
         <p className={styles.date}>{format(new Date(movie.createdAt), "P")}</p>
-      </div>
+      </button>
     </li>
   );
 };
