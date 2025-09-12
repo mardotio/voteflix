@@ -1,9 +1,11 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { Drawer } from "../../../components/Drawer";
 import { CircleCaretIcon, SortIcon } from "../../../components/Icon";
 import { MovieCard } from "../../../components/MovieCard";
+import { MovieDetails } from "../../../components/MovieDetails";
 import { type MovieStatus, moviesApi } from "../../../utils/client/moviesApi";
 import { MOVIE_STATUS_LABELS } from "../../../utils/statusLabels";
 import styles from "./movies.module.scss";
@@ -16,6 +18,7 @@ const LABELS: Record<MovieStatus | "all", string> = {
 const MoviesLayout = () => {
   const [status, setStatus] = useState<MovieStatus | "all">("all");
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
+  const [selectedMovie, setSelectedMovie] = useState<string | null>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
@@ -37,6 +40,12 @@ const MoviesLayout = () => {
       initialPageParam: "",
       staleTime: 1000 * 60,
     });
+
+  const { data: movieDetails } = useQuery({
+    queryFn: ({ queryKey }) => moviesApi.getMovie(queryKey[1].id),
+    queryKey: ["movie", { id: selectedMovie as string }] as const,
+    enabled: selectedMovie !== null,
+  });
 
   return (
     <>
@@ -63,7 +72,13 @@ const MoviesLayout = () => {
       </div>
       <ul>
         {data?.pages.map((p) =>
-          p.data.map((m) => <MovieCard key={m.id} movie={m} />),
+          p.data.map((m) => (
+            <MovieCard
+              key={m.id}
+              movie={m}
+              onClick={() => setSelectedMovie(m.id)}
+            />
+          )),
         )}
       </ul>
       {hasNextPage && (
@@ -76,6 +91,14 @@ const MoviesLayout = () => {
           </button>
         </div>
       )}
+      <Drawer
+        isOpen={selectedMovie !== null}
+        onClose={() => setSelectedMovie(null)}
+        className={styles["movie-details"]}
+        header={movieDetails?.name}
+      >
+        <MovieDetails movie={movieDetails ?? null} />
+      </Drawer>
     </>
   );
 };

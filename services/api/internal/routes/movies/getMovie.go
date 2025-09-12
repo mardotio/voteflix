@@ -24,7 +24,7 @@ type rating struct {
 }
 
 type vote struct {
-	IsApproval bool                 `json:"is-approval"`
+	IsApproval bool                 `json:"isApproval"`
 	UserId     string               `json:"userId"`
 	CreatedAt  utils.JsonEpochTime  `json:"createdAt"`
 	UpdatedAt  *utils.JsonEpochTime `json:"updatedAt"`
@@ -39,6 +39,7 @@ type getMovieResponse struct {
 	Ratings   []rating             `json:"ratings"`
 	CreatedAt utils.JsonEpochTime  `json:"createdAt"`
 	UpdatedAt *utils.JsonEpochTime `json:"updatedAt"`
+	CreatorId string               `json:"creatorId"`
 	Users     usersMap             `json:"users"`
 }
 
@@ -120,6 +121,11 @@ func getRelevantUsers(db *bun.DB, ctx context.Context, movie models.Movie, ratin
 		}
 	}
 
+	if !presentUsers[movie.CreatorId] {
+		presentUsers[movie.CreatorId] = true
+		ids = append(ids, movie.CreatorId)
+	}
+
 	userSubQuery := db.NewSelect().
 		Model((*models.User)(nil)).
 		Where("id IN (?)", bun.In(ids))
@@ -188,6 +194,7 @@ func (h *Handler) GetMovie(w http.ResponseWriter, r *http.Request) {
 		Status:    targetMovie.Status,
 		Ratings:   ratings,
 		Votes:     votes,
+		CreatorId: targetMovie.CreatorId,
 		CreatedAt: utils.JsonEpochTime(targetMovie.CreatedAt),
 		UpdatedAt: (*utils.JsonEpochTime)(targetMovie.UpdatedAt),
 		Users:     users,

@@ -40,6 +40,40 @@ export interface CreateMovieRequest {
   name: string;
 }
 
+interface MovieDetailsRating {
+  rating: number;
+  userId: string;
+  createdAt: number;
+  updatedAt: number | null;
+}
+
+export interface MovieDetailsVote {
+  isApproval: boolean;
+  userId: string;
+  createdAt: number;
+  updatedAt: number | null;
+}
+
+export interface MovieDetailsUsersMap {
+  [UserId: string]: {
+    name: string;
+    avatarUrl: string | null;
+  };
+}
+
+export interface GetMovieResponse {
+  id: string;
+  name: string;
+  listId: string;
+  status: MovieStatus;
+  votes: MovieDetailsVote[];
+  ratings: MovieDetailsRating[];
+  creatorId: string;
+  createdAt: number;
+  updatedAt: number | null;
+  users: MovieDetailsUsersMap;
+}
+
 export const moviesApi = {
   listMovies: (options: ListMoviesRequest) =>
     ApiFetch.fetch<ListMoviesResponse>({
@@ -52,5 +86,10 @@ export const moviesApi = {
       method: "POST",
       route: "/api/movies",
       body,
+    }),
+  getMovie: (movieId: string) =>
+    ApiFetch.fetch<GetMovieResponse>({
+      method: "GET",
+      route: `/api/movies/${movieId}`,
     }),
 };

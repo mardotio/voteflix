@@ -3,18 +3,24 @@
     margin-bottom: 8px;
   }
 
-  > div {
+  > button {
     display: flex;
     flex-direction: column;
+    text-align: left;
     background-color: var(--theme-bg-90);
     border-radius: 8px;
     padding: 12px;
     gap: 4px;
+    width: 100%;
+    border: 0;
+    color: var(--theme-ui);
+    cursor: pointer;
   }
 }
 
 .header {
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
 }

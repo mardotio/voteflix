@@ -2,15 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { moviesApi } from "../../utils/client/moviesApi";
-import { CloseIcon, PlusSquareIcon } from "../Icon";
+import { Drawer, type DrawerProps } from "../Drawer";
+import { PlusSquareIcon } from "../Icon";
 import styles from "./AddMovie.module.scss";
 
-interface AddMovieProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export const AddMovie = ({ isOpen, onClose }: AddMovieProps) => {
+export const AddMovie = ({
+  isOpen,
+  onClose,
+}: Omit<DrawerProps, "children">) => {
   const queryClient = useQueryClient();
   const [movie, setMovie] = useState("");
   const [hasNew, setHasNew] = useState(false);
@@ -40,31 +39,24 @@ export const AddMovie = ({ isOpen, onClose }: AddMovieProps) => {
   };
 
   return (
-    <div
-      className={`${styles.container} ${isOpen ? styles.open : styles.closed}`}
-    >
-      <div className={styles.main}>
-        <button onClick={close} className={styles["close-button"]}>
-          <CloseIcon size={32} />
+    <Drawer onClose={close} isOpen={isOpen} className={styles.main}>
+      <div className={styles["movie-input"]}>
+        <input
+          placeholder="Jurassic Park"
+          name="movie"
+          value={movie}
+          onChange={(e) => setMovie(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              submit();
+            }
+          }}
+          disabled={isPending}
+        />
+        <button onClick={submit}>
+          <PlusSquareIcon size={32} />
         </button>
-        <div className={styles["movie-input"]}>
-          <input
-            placeholder="Jurassic Park"
-            name="movie"
-            value={movie}
-            onChange={(e) => setMovie(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                submit();
-              }
-            }}
-            disabled={isPending}
-          />
-          <button onClick={submit}>
-            <PlusSquareIcon size={32} />
-          </button>
-        </div>
       </div>
-    </div>
+    </Drawer>
   );
 };
