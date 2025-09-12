@@ -8,6 +8,7 @@ export interface ListMoviesRequest {
   status?: MovieStatus;
   before?: string;
   after?: string;
+  query?: string;
 }
 
 export interface Movie {
