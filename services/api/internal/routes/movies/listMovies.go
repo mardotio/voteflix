@@ -2,6 +2,7 @@ package movies
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/uptrace/bun"
 	"net/http"
@@ -13,10 +14,14 @@ import (
 
 type listMoviesQueryParams struct {
 	Status string `validate:"omitempty,oneof=pending approved watched rejected"`
+	Query  string `validate:"omitempty,max=100"`
 }
 
 func getListMoviesQueryParams(values url.Values, validate *validator.Validate) (listMoviesQueryParams, error) {
-	params := listMoviesQueryParams{Status: values.Get("status")}
+	params := listMoviesQueryParams{
+		Status: values.Get("status"),
+		Query:  values.Get("query"),
+	}
 
 	err := validate.Struct(&params)
 
@@ -67,6 +72,10 @@ func listMovies(
 
 	if queryParams.Status != "" {
 		moviesSubQuery.Where("status = ?", queryParams.Status)
+	}
+
+	if queryParams.Query != "" {
+		moviesSubQuery.Where("name ilike ?", fmt.Sprintf("%%%s%%", queryParams.Query))
 	}
 
 	if !cursor.IsStart() {
