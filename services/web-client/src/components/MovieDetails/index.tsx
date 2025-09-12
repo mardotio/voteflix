@@ -26,7 +26,7 @@ export const MovieDetails = ({ movie }: MovieDetailsProps) => {
           creatorId={movie.creatorId}
           users={movie.users}
           votes={movie.votes}
-          watchedAt={movie.updatedAt /*TODO: need watched at field from BE*/}
+          watchedAt={movie.watchedAt}
         />
       </div>
       {movie.ratings.length > 0 && (

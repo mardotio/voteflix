@@ -72,6 +72,7 @@ export interface GetMovieResponse {
   creatorId: string;
   createdAt: number;
   updatedAt: number | null;
+  watchedAt: number | null;
   users: MovieDetailsUsersMap;
 }
 

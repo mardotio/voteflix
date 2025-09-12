@@ -39,6 +39,7 @@ type getMovieResponse struct {
 	Ratings   []rating             `json:"ratings"`
 	CreatedAt utils.JsonEpochTime  `json:"createdAt"`
 	UpdatedAt *utils.JsonEpochTime `json:"updatedAt"`
+	WatchedAt *utils.JsonEpochTime `json:"watchedAt"`
 	CreatorId string               `json:"creatorId"`
 	Users     usersMap             `json:"users"`
 }
@@ -197,6 +198,7 @@ func (h *Handler) GetMovie(w http.ResponseWriter, r *http.Request) {
 		CreatorId: targetMovie.CreatorId,
 		CreatedAt: utils.JsonEpochTime(targetMovie.CreatedAt),
 		UpdatedAt: (*utils.JsonEpochTime)(targetMovie.UpdatedAt),
+		WatchedAt: (*utils.JsonEpochTime)(targetMovie.WatchedAt),
 		Users:     users,
 	})
 }

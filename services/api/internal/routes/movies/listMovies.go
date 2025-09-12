@@ -40,6 +40,7 @@ type listMovieDetails struct {
 	Creator   listMovieCreator     `json:"creator"`
 	CreatedAt utils.JsonEpochTime  `json:"createdAt"`
 	UpdatedAt *utils.JsonEpochTime `json:"updatedAt"`
+	WatchedAt *utils.JsonEpochTime `json:"watchedAt"`
 }
 
 func (r listMovieDetails) CursorId() *string { return &r.Id }
@@ -122,6 +123,7 @@ func toMovieDetails(movies []movieWithUser) []listMovieDetails {
 			Creator:   creator,
 			CreatedAt: utils.JsonEpochTime(m.CreatedAt),
 			UpdatedAt: (*utils.JsonEpochTime)(m.UpdatedAt),
+			WatchedAt: (*utils.JsonEpochTime)(m.WatchedAt),
 		}
 	}
 

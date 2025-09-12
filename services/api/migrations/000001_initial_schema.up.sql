@@ -52,13 +52,15 @@ create table if not exists movies (
     creator_id uuid not null,
     created_at timestamp default current_timestamp,
     updated_at timestamp,
+    watched_at timestamp,
 
     foreign key (list_id) references lists(id),
     foreign key (creator_id) references users(id),
 
     constraint movies_valid_status check (status in ('pending', 'approved', 'watched', 'rejected')),
     constraint movies_valid_approve_count check (approve_count > -1),
-    constraint movies_valid_reject_count check (reject_count > -1)
+    constraint movies_valid_reject_count check (reject_count > -1),
+    constraint movies_valid_status_and_watched_timestamp check ((status = 'watched' and watched_at is not null) or (status != 'watched' and watched_at is null))
 );
 
 create table if not exists ratings (
