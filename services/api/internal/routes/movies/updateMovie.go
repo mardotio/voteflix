@@ -73,6 +73,7 @@ type updateMovieResponse struct {
 	Status    string               `json:"status"`
 	CreatedAt utils.JsonEpochTime  `json:"createdAt"`
 	UpdatedAt *utils.JsonEpochTime `json:"updatedAt"`
+	WatchedAt *utils.JsonEpochTime `json:"watchedAt"`
 }
 
 func (body updateMovieResponse) Render(w http.ResponseWriter, r *http.Request) error { return nil }
@@ -93,6 +94,7 @@ func (h *Handler) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 		Status:    targetMovie.Status,
 		CreatedAt: utils.JsonEpochTime(targetMovie.CreatedAt),
 		UpdatedAt: (*utils.JsonEpochTime)(targetMovie.UpdatedAt),
+		WatchedAt: (*utils.JsonEpochTime)(targetMovie.WatchedAt),
 	}
 
 	if errors.Is(validationError, noUpdateError) {
@@ -122,6 +124,14 @@ func (h *Handler) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 	if body.Status != nil {
 		response.Status = *body.Status
 		updateQuery.Set("status = ?", *body.Status)
+
+		if *body.Status == "watched" {
+			response.WatchedAt = (*utils.JsonEpochTime)(&now)
+			updateQuery.Set("watched_at = ?", now)
+		} else if targetMovie.WatchedAt != nil {
+			response.WatchedAt = nil
+			updateQuery.Set("watched_at = ?", nil)
+		}
 	}
 
 	_, updateErr := updateQuery.Exec(ctx)
