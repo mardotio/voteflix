@@ -10,6 +10,7 @@ export interface DrawerProps {
   children: ReactNode;
   className?: string;
   header?: ReactNode;
+  height?: string;
 }
 
 export const Drawer = ({
@@ -18,12 +19,13 @@ export const Drawer = ({
   onClose,
   className,
   header,
+  height,
 }: DrawerProps) => {
   return createPortal(
     <div
       className={`${styles.container} ${isOpen ? styles.open : styles.closed}`}
     >
-      <div className={styles.main}>
+      <div className={styles.main} style={height ? { height } : undefined}>
         <div className={styles.header}>
           <button onClick={onClose} className={styles["close-button"]}>
             <CloseIcon size={32} />
