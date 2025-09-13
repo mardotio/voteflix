@@ -3,7 +3,11 @@ import { format } from "date-fns";
 import { useEffect, useState } from "react";
 
 import { useCurrentUser } from "../../hooks/useCurrentUser";
-import { type GetMovieResponse, moviesApi } from "../../utils/client/moviesApi";
+import {
+  type GetMovieResponse,
+  type MovieStatus,
+  moviesApi,
+} from "../../utils/client/moviesApi";
 import { Avatar } from "../Avatar";
 import { Drawer } from "../Drawer";
 import { LikeIcon } from "../Icon";
@@ -36,8 +40,10 @@ const MovieDetailsContent = ({
     mutationFn: ({ approve, movieId }: { movieId: string; approve: boolean }) =>
       moviesApi.addMovieVote(movieId, approve),
     mutationKey: ["votes"],
-    onSuccess: (p) => {
-      queryClient.invalidateQueries({ queryKey: ["movie", { id: p.movieId }] });
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({
+        queryKey: ["movie", { id: res.movieId }],
+      });
       setView("details");
     },
   });
@@ -45,9 +51,25 @@ const MovieDetailsContent = ({
     mutationFn: ({ rating, movieId }: { movieId: string; rating: number }) =>
       moviesApi.addMovieRating(movieId, rating),
     mutationKey: ["reactions"],
-    onSuccess: (p) => {
-      queryClient.invalidateQueries({ queryKey: ["movie", { id: p.movieId }] });
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({
+        queryKey: ["movie", { id: res.movieId }],
+      });
       setView("details");
+    },
+  });
+  const { mutate: updateMovie, isPending: isChangingStatus } = useMutation({
+    mutationFn: ({
+      status,
+      movieId,
+    }: {
+      movieId: string;
+      status: MovieStatus;
+    }) => moviesApi.updateMovie(movieId, { status }),
+    mutationKey: ["movie"],
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["movie", { id: res.id }] });
+      queryClient.invalidateQueries({ queryKey: ["movies"] });
     },
   });
 
@@ -121,6 +143,28 @@ const MovieDetailsContent = ({
           votes={movie.votes}
           watchedAt={movie.watchedAt}
         />
+        {movie.status === "approved" && (
+          <button
+            className={styles["status-toggle"]}
+            onClick={() =>
+              updateMovie({ movieId: movie.id, status: "watched" })
+            }
+            disabled={isChangingStatus}
+          >
+            Mark as watched
+          </button>
+        )}
+        {movie.status === "watched" && movie.ratings.length <= 0 && (
+          <button
+            className={styles["status-toggle"]}
+            onClick={() =>
+              updateMovie({ movieId: movie.id, status: "approved" })
+            }
+            disabled={isChangingStatus}
+          >
+            Mark as unwatched
+          </button>
+        )}
       </div>
       {movie.ratings.length > 0 && (
         <div>
@@ -192,6 +236,7 @@ export const MovieDetails = ({ movie, onClose }: MovieDetailsProps) => {
       onClose={onClose}
       className={styles["movie-details"]}
       header={movie?.name}
+      onBack={view !== "details" ? () => setView("details") : undefined}
     >
       {movie && (
         <MovieDetailsContent movie={movie} view={view} setView={setView} />
