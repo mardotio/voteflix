@@ -15,7 +15,7 @@ import (
 	"voteflix/api/internal/utils"
 )
 
-const statusThreshold = 1
+const statusThreshold = 2
 
 type addMovieVoteRequest struct {
 	Approve *bool `json:"approve" validate:"boolean,required"`

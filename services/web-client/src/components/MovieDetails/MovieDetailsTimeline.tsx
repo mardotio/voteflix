@@ -28,7 +28,7 @@ const getVoteLine = (status: MovieStatus, votes: MovieDetailsVote[]) => {
 
   return (
     <li>
-      <span className={styles.green} />
+      <span className={status === "rejected" ? styles.red : styles.green} />
       <div className={styles.details}>
         <p className={styles.timestamp}>
           {toTimestamp(lastVote.updatedAt ?? lastVote.createdAt)}

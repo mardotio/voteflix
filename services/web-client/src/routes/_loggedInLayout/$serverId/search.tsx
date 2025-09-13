@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { Drawer } from "../../../components/Drawer";
 import { MovieCard } from "../../../components/MovieCard";
 import { MovieDetails } from "../../../components/MovieDetails";
 import { moviesApi } from "../../../utils/client/moviesApi";
@@ -57,14 +56,10 @@ const SearchLayout = () => {
           ))}
         </ul>
       </div>
-      <Drawer
-        isOpen={selectedMovie !== null}
+      <MovieDetails
+        movie={movieDetails ?? null}
         onClose={() => setSelectedMovie(null)}
-        className={styles["movie-details"]}
-        header={movieDetails?.name}
-      >
-        <MovieDetails movie={movieDetails ?? null} />
-      </Drawer>
+      />
     </>
   );
 };

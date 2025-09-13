@@ -2,7 +2,6 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { Drawer } from "../../../components/Drawer";
 import { CircleCaretIcon, SortIcon } from "../../../components/Icon";
 import { MovieCard } from "../../../components/MovieCard";
 import { MovieDetails } from "../../../components/MovieDetails";
@@ -91,14 +90,11 @@ const MoviesLayout = () => {
           </button>
         </div>
       )}
-      <Drawer
-        isOpen={selectedMovie !== null}
+
+      <MovieDetails
+        movie={movieDetails ?? null}
         onClose={() => setSelectedMovie(null)}
-        className={styles["movie-details"]}
-        header={movieDetails?.name}
-      >
-        <MovieDetails movie={movieDetails ?? null} />
-      </Drawer>
+      />
     </>
   );
 };

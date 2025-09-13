@@ -76,6 +76,17 @@ export interface GetMovieResponse {
   users: MovieDetailsUsersMap;
 }
 
+export interface AddMovieVoteRequest {
+  approve: boolean;
+}
+
+export interface AddMovieVoteResponse {
+  movieId: string;
+  approved: boolean;
+  createdAt: number;
+  updatedAt: number | null;
+}
+
 export const moviesApi = {
   listMovies: (options: ListMoviesRequest) =>
     ApiFetch.fetch<ListMoviesResponse>({
@@ -93,5 +104,11 @@ export const moviesApi = {
     ApiFetch.fetch<GetMovieResponse>({
       method: "GET",
       route: `/api/movies/${movieId}`,
+    }),
+  addMovieVote: (movieId: string, approve: boolean) =>
+    ApiFetch.fetch<AddMovieVoteResponse, AddMovieVoteRequest>({
+      method: "PUT",
+      route: `/api/movies/${movieId}/votes`,
+      body: { approve },
     }),
 };
