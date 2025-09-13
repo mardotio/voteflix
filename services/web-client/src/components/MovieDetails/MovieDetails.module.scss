@@ -164,3 +164,19 @@
     }
   }
 }
+
+.status-toggle {
+  font-size: 14px;
+  background-color: transparent;
+  border: 1px solid rgb(from var(--theme-ui) r g b/.8);
+  color: 1px solid rgb(from var(--theme-ui) r g b/.8);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform ease 100ms;
+  margin-left: 16px;
+
+  &:active {
+    transform: scale(0.9);
+  }
+}

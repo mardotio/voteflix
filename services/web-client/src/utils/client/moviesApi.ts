@@ -91,6 +91,20 @@ export interface AddMovieVoteResponse {
   updatedAt: number | null;
 }
 
+export interface UpdateMovieRequest {
+  name?: string;
+  status?: MovieStatus;
+}
+
+export interface UpdateMovieResponse {
+  id: string;
+  name: string;
+  status: MovieStatus;
+  createdAt: number;
+  updatedAt: number | null;
+  watchedAt: number | null;
+}
+
 export const moviesApi = {
   listMovies: (options: ListMoviesRequest) =>
     ApiFetch.fetch<ListMoviesResponse>({
@@ -120,5 +134,11 @@ export const moviesApi = {
       method: "PUT",
       route: `/api/movies/${movieId}/ratings`,
       body: { rating },
+    }),
+  updateMovie: (movieId: string, body: UpdateMovieRequest) =>
+    ApiFetch.fetch<UpdateMovieResponse, UpdateMovieRequest>({
+      method: "PATCH",
+      route: `/api/movies/${movieId}`,
+      body,
     }),
 };

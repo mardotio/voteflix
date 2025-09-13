@@ -1,3 +1,4 @@
+export * from "./ArrowIcon";
 export * from "./CircleCaretIcon";
 export * from "./ClapperBoardClosedIcon";
 export * from "./CloseIcon";
