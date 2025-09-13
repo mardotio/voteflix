@@ -80,6 +80,10 @@ export interface AddMovieVoteRequest {
   approve: boolean;
 }
 
+export interface AddMovieRatingRequest {
+  rating: number;
+}
+
 export interface AddMovieVoteResponse {
   movieId: string;
   approved: boolean;
@@ -110,5 +114,11 @@ export const moviesApi = {
       method: "PUT",
       route: `/api/movies/${movieId}/votes`,
       body: { approve },
+    }),
+  addMovieRating: (movieId: string, rating: number) =>
+    ApiFetch.fetch<AddMovieVoteResponse, AddMovieRatingRequest>({
+      method: "PUT",
+      route: `/api/movies/${movieId}/ratings`,
+      body: { rating },
     }),
 };

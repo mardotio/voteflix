@@ -7,13 +7,16 @@ import { type GetMovieResponse, moviesApi } from "../../utils/client/moviesApi";
 import { Avatar } from "../Avatar";
 import { Drawer } from "../Drawer";
 import { LikeIcon } from "../Icon";
+import { RatingSlider } from "../RatingSlider";
 import styles from "./MovieDetails.module.scss";
 import { MovieDetailsTimeline } from "./MovieDetailsTimeline";
 
+type View = "details" | "vote" | "reaction";
+
 interface MovieDetailsContentProps {
   movie: GetMovieResponse;
-  view: "details" | "vote";
-  setView: (v: "details" | "vote") => void;
+  view: View;
+  setView: (v: View) => void;
 }
 
 const MovieDetailsContent = ({
@@ -25,12 +28,23 @@ const MovieDetailsContent = ({
   const currentUser = useCurrentUser();
   const userVote =
     movie.votes.find((v) => v.userId === currentUser.id)?.isApproval ?? null;
+  const userRating =
+    movie.ratings.find((v) => v.userId === currentUser.id)?.rating ?? null;
+  const [rating, setRating] = useState<number | null>(userRating);
   const [vote, setVote] = useState<boolean | null>(userVote);
-  const [isAddingVote, setIsAddingVote] = useState(false);
-  const { mutate: addMovieVote, isPending } = useMutation({
+  const { mutate: addMovieVote, isPending: isVoting } = useMutation({
     mutationFn: ({ approve, movieId }: { movieId: string; approve: boolean }) =>
       moviesApi.addMovieVote(movieId, approve),
     mutationKey: ["votes"],
+    onSuccess: (p) => {
+      queryClient.invalidateQueries({ queryKey: ["movie", { id: p.movieId }] });
+      setView("details");
+    },
+  });
+  const { mutate: addMovieRating, isPending: isRating } = useMutation({
+    mutationFn: ({ rating, movieId }: { movieId: string; rating: number }) =>
+      moviesApi.addMovieRating(movieId, rating),
+    mutationKey: ["reactions"],
     onSuccess: (p) => {
       queryClient.invalidateQueries({ queryKey: ["movie", { id: p.movieId }] });
       setView("details");
@@ -59,13 +73,34 @@ const MovieDetailsContent = ({
         </div>
 
         <button
-          disabled={vote === null || isPending}
+          disabled={vote === null || isVoting}
           onClick={() => {
             if (vote === null || userVote === vote) {
               setView("details");
               return;
             }
             addMovieVote({ approve: vote, movieId: movie.id });
+          }}
+        >
+          Submit
+        </button>
+      </div>
+    );
+  }
+
+  if (view === "reaction") {
+    return (
+      <div className={styles["vote-view"]}>
+        <h6>What did you think?</h6>
+        <RatingSlider onChange={setRating} value={rating} />
+        <button
+          disabled={rating === null || isRating}
+          onClick={() => {
+            if (rating === null || userRating === rating) {
+              setView("details");
+              return;
+            }
+            addMovieRating({ rating, movieId: movie.id });
           }}
         >
           Submit
@@ -128,9 +163,11 @@ export interface MovieDetailsProps {
 
 export const MovieDetails = ({ movie, onClose }: MovieDetailsProps) => {
   const currentUser = useCurrentUser();
-  const [view, setView] = useState<"details" | "vote">("details");
+  const [view, setView] = useState<View>("details");
   const userVote =
     movie?.votes.find((v) => v.userId === currentUser.id)?.isApproval ?? null;
+  const userRating =
+    movie?.ratings.find((v) => v.userId === currentUser.id)?.rating ?? null;
 
   useEffect(() => {
     if (!movie?.status) {
@@ -139,14 +176,18 @@ export const MovieDetails = ({ movie, onClose }: MovieDetailsProps) => {
 
     if (movie.status === "pending" && userVote === null) {
       setView("vote");
+    } else if (movie.status === "watched" && userRating === null) {
+      setView("reaction");
     } else {
       setView("details");
     }
-  }, [movie?.status, userVote]);
+  }, [movie?.status, userVote, userRating]);
 
   return (
     <Drawer
-      height={view === "vote" ? "250px" : undefined}
+      height={
+        view === "details" ? undefined : view === "reaction" ? "280px" : "250px"
+      }
       isOpen={movie !== null}
       onClose={onClose}
       className={styles["movie-details"]}
