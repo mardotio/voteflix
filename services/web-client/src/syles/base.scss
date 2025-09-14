@@ -6,13 +6,19 @@
   --theme-bg-80: #292929;
   --theme-primary: #0c8be8;
   --theme-secondary: #5b8fb9;
-  --theme-ui: ghostwhite;
+  --theme-ui: #f4f8fb;
+  --theme-success: #5fa95f;
+  --theme-critical: #f37070;
 
   @media (prefers-color-scheme: light) {
-    --theme-bg: ghostwhite;
-    --theme-primary: #0c8be8;
+    --theme-bg: #ffffff;
+    --theme-bg-90: #f4f8fb;
+    --theme-bg-80: #eaf1f8;
+    --theme-primary: #46a4e9;
     --theme-secondary: #5b8fb9;
-    --theme-ui: #03001c;
+    --theme-ui: #233064;
+    --theme-success: #10d310;
+    --theme-critical: #f37070;
   }
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

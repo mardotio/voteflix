@@ -30,6 +30,7 @@
       border-radius: 50%;
       transition: transform ease 100ms;
       border: 0;
+      background-color: var(--theme-ui);
 
       &:active {
         transform: scale(1.5);
@@ -58,6 +59,7 @@
       width: 24px;
       top: -12px;
       transition: transform ease 100ms;
+      background-color: var(--theme-ui);
 
       &:active {
         transform: scale(1.5);
