@@ -4,12 +4,18 @@ import (
 	"fmt"
 )
 
-func GetAvatarUrl(discordUserId string, avatarId *string) *string {
+func GetAvatarUrl(discordUserId string, avatarId *string, isServer bool) *string {
 	if avatarId == nil {
 		return nil
 	}
 
-	url := fmt.Sprintf("https://cdn.discordapp.com/avatars/%s/%s.png", discordUserId, *avatarId)
+	path := "avatars"
+
+	if isServer {
+		path = "icons"
+	}
+
+	url := fmt.Sprintf("https://cdn.discordapp.com/%s/%s/%s.png", path, discordUserId, *avatarId)
 
 	return &url
 }

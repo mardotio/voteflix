@@ -14,13 +14,14 @@ import (
 )
 
 type createListRequest struct {
-	DiscordUserId     string  `json:"discordUserId" validate:"required,max=100"`
-	DiscordUsername   string  `json:"discordUsername" validate:"required,max=100"`
-	DiscordServerId   string  `json:"discordServerId" validate:"required,max=100"`
-	DiscordServerName string  `json:"discordServerName" validate:"required,max=100"`
-	DiscordNickname   *string `json:"discordNickname" validate:"omitempty,max=100"`
-	DiscordAvatarId   *string `json:"discordAvatarId" validate:"omitempty,max=100"`
-	validator         *validator.Validate
+	DiscordUserId         string  `json:"discordUserId" validate:"required,max=100"`
+	DiscordUsername       string  `json:"discordUsername" validate:"required,max=100"`
+	DiscordServerId       string  `json:"discordServerId" validate:"required,max=100"`
+	DiscordServerName     string  `json:"discordServerName" validate:"required,max=100"`
+	DiscordServerAvatarId *string `json:"discordServerAvatarId" validate:"omitempty,max=100"`
+	DiscordNickname       *string `json:"discordNickname" validate:"omitempty,max=100"`
+	DiscordAvatarId       *string `json:"discordAvatarId" validate:"omitempty,max=100"`
+	validator             *validator.Validate
 }
 
 type createListResponse struct {
@@ -66,6 +67,7 @@ func createList(ctx context.Context, tx bun.Tx, body *createListRequest, userId 
 		CreatorId:       userId,
 		Name:            body.DiscordServerName,
 		DiscordServerId: body.DiscordServerId,
+		DiscordAvatarId: body.DiscordServerAvatarId,
 	}
 
 	_, err := tx.NewInsert().Model(&list).Exec(ctx)

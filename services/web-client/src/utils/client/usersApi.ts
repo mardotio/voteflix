@@ -8,6 +8,7 @@ export interface WhoAmIResponse {
     id: string;
     name: string;
     serverId: string;
+    avatarId: string | null;
   };
 }
 

@@ -154,7 +154,7 @@ func getRelevantUsers(db *bun.DB, ctx context.Context, movie models.Movie, ratin
 
 		userMap[u.Id] = owner{
 			Name:      name,
-			AvatarUrl: utils.GetAvatarUrl(u.DiscordId, u.DiscordAvatarId),
+			AvatarUrl: utils.GetAvatarUrl(u.DiscordId, u.DiscordAvatarId, false),
 		}
 	}
 
