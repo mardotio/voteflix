@@ -64,11 +64,11 @@
       }
 
       &.green {
-        --highlight-color: #5fa95f;
+        --highlight-color: var(--theme-success);
       }
 
       &.red {
-        --highlight-color: #f37070;
+        --highlight-color: var(--theme-critical);
       }
     }
 
@@ -142,7 +142,7 @@
     gap: 16px;
 
     > button {
-      --vote-color: #5fa95f;
+      --vote-color: var(--theme-success);
       border: 0;
       padding: 12px;
       border-radius: 8px;
@@ -151,7 +151,7 @@
       transition: transform ease 100ms;
 
       &:last-child {
-        --vote-color: #f37070;
+        --vote-color: var(--theme-critical);
       }
 
       &.active {
