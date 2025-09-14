@@ -25,6 +25,7 @@ create table if not exists lists (
     creator_id uuid not null,
     created_at timestamp default current_timestamp,
     updated_at timestamp,
+    discord_avatar_id varchar(100),
 
     foreign key (creator_id) references users(id)
 );

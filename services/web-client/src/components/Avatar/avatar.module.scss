@@ -4,8 +4,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--theme-secondary);
   color: var(--theme-bg);
+
+  &.empty {
+    background-color: var(--theme-secondary);
+  }
 
   @each $size in (12, 24, 36, 48) {
     &.size-#{$size} {

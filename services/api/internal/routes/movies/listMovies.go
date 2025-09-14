@@ -109,7 +109,7 @@ func toMovieDetails(movies []movieWithUser) []listMovieDetails {
 	for i, m := range movies {
 		creator := listMovieCreator{
 			Name:      m.DiscordUsername,
-			AvatarUrl: utils.GetAvatarUrl(m.DiscordId, m.DiscordAvatarId),
+			AvatarUrl: utils.GetAvatarUrl(m.DiscordId, m.DiscordAvatarId, false),
 		}
 
 		if m.DiscordNickname != nil {

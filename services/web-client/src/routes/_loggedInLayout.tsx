@@ -26,8 +26,8 @@ function RouteComponent() {
         <div className={styles["header-outer"]}>
           <div className={styles.header}>
             <Avatar
-              name={currentUser.displayName}
-              src={currentUser.avatarUrl}
+              name={currentUser.list.name}
+              src={currentUser.list.avatarId}
             />
             <h3>{currentUser.list.name.toLocaleUpperCase()}</h3>
           </div>

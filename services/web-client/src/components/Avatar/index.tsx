@@ -15,9 +15,9 @@ export const Avatar = ({ size = 48, name, src }: AvatarProps) => {
   if (!src) {
     return (
       <div
-        className={`${styles.wrapper} ${styles[`size-${size}`]}`}
+        className={`${styles.wrapper} ${styles.empty} ${styles[`size-${size}`]}`}
         role="img"
-        aria-description="placeholder avatar"
+        aria-description={`Avatar for ${name}`}
       >
         <div>
           {i1}
@@ -29,7 +29,7 @@ export const Avatar = ({ size = 48, name, src }: AvatarProps) => {
 
   return (
     <div className={`${styles.wrapper} ${styles[`size-${size}`]}`}>
-      <img src={src} alt="User avatar" loading="lazy" />
+      <img src={src} alt={`Avatar for ${name}`} loading="lazy" />
     </div>
   );
 };

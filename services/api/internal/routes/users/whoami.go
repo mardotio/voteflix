@@ -15,9 +15,10 @@ type whoAmIResponse struct {
 }
 
 type listDetails struct {
-	Id       string `json:"id"`
-	Name     string `json:"name"`
-	ServerId string `json:"serverId"`
+	Id       string  `json:"id"`
+	Name     string  `json:"name"`
+	ServerId string  `json:"serverId"`
+	AvatarId *string `json:"avatarId"`
 }
 
 func (rd whoAmIResponse) Render(w http.ResponseWriter, r *http.Request) error { return nil }
@@ -50,8 +51,12 @@ func (h *Handler) WhoAmI(w http.ResponseWriter, r *http.Request) {
 			Name:     user.List.Name,
 			ServerId: user.List.DiscordServerId,
 		},
-		AvatarUrl:   utils.GetAvatarUrl(user.User.DiscordId, user.User.DiscordAvatarId),
+		AvatarUrl:   utils.GetAvatarUrl(user.User.DiscordId, user.User.DiscordAvatarId, false),
 		DisplayName: user.User.DiscordUsername,
+	}
+
+	if user.List.DiscordAvatarId != nil {
+		response.List.AvatarId = utils.GetAvatarUrl(user.List.DiscordServerId, user.List.DiscordAvatarId, true)
 	}
 
 	if user.DiscordNickname != nil {
