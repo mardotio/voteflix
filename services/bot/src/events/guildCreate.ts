@@ -13,6 +13,7 @@ export const createList = async (
     discordNickname: guildUser.nickname,
     discordServerId: guild.id,
     discordServerName: guild.name,
+    discordServerAvatarId: guild.icon,
     discordUserId: user.id,
     discordUsername: user.username || "",
   });

@@ -9,6 +9,7 @@ export interface CreateListRequest {
   discordUsername: string;
   discordServerId: string;
   discordServerName: string;
+  discordServerAvatarId: string | null;
   discordNickname: string | null;
   discordAvatarId: string | null;
 }
