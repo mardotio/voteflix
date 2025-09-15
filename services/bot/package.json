@@ -9,6 +9,7 @@
     "dev": "ts-node src/index.ts",
     "start": "node build/discord.js",
     "build": "webpack --config webpack.config.ts",
+    "build:prod": "NODE_ENV=production webpack --config webpack.config.ts",
     "format": "prettier --log-level silent --write .",
     "format:check": "prettier --check .",
     "test": "echo \"Error: no test specified\" && exit 1"
