@@ -46,7 +46,6 @@ export const login: BotCommand = {
     });
 
     await interaction.reply({
-      content: jwt,
       components: [getLoginButton(jwt)],
       flags: ["Ephemeral"],
     });

@@ -37,13 +37,13 @@ export class ApiFetch {
 
   static async fetch<Res, Body extends object | undefined = undefined>({
     route,
-    method,
-    headers = {},
     body,
+    method = "GET",
+    headers = {},
     searchParams = {},
   }: {
     route: string;
-    method: Request["method"];
+    method?: Request["method"];
     body?: Body;
     headers?: Record<string, string>;
     searchParams?: Record<string, string>;

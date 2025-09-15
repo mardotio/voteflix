@@ -15,7 +15,6 @@ export interface WhoAmIResponse {
 export const usersApi = {
   whoAmI: async () =>
     ApiFetch.fetch<WhoAmIResponse>({
-      method: "GET",
       route: "/api/users/whoami",
     }),
 };

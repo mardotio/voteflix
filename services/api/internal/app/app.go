@@ -87,7 +87,7 @@ func (app *App) Db() *bun.DB {
 		db := bun.NewDB(pgDb, pgdialect.New())
 
 		db.AddQueryHook(bundebug.NewQueryHook(
-			bundebug.WithVerbose(true),
+			bundebug.WithVerbose(!app.config.IsProduction()),
 		))
 
 		app.db = db
