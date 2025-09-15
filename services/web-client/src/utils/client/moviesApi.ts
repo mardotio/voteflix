@@ -108,7 +108,6 @@ export interface UpdateMovieResponse {
 export const moviesApi = {
   listMovies: (options: ListMoviesRequest) =>
     ApiFetch.fetch<ListMoviesResponse>({
-      method: "GET",
       route: "/api/movies",
       searchParams: options as unknown as Record<string, string>,
     }),
@@ -120,7 +119,6 @@ export const moviesApi = {
     }),
   getMovie: (movieId: string) =>
     ApiFetch.fetch<GetMovieResponse>({
-      method: "GET",
       route: `/api/movies/${movieId}`,
     }),
   addMovieVote: (movieId: string, approve: boolean) =>
