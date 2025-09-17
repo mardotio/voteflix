@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine AS build
+FROM golang:1.24 AS build
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY internal internal
 
 RUN go build cmd/voteflix/main.go
 
-FROM golang:1.24-alpine
+FROM golang:1.24
 
 WORKDIR /app
 

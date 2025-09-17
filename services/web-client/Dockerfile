@@ -14,4 +14,5 @@ RUN npm run build
 FROM nginx:1.29
 
 RUN mkdir /etc/certs
+RUN mkdir /code/challenge/static
 COPY --from=builder /app/dist /code/voteflix/static
