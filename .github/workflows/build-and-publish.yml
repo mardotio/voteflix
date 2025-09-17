@@ -46,21 +46,38 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Extract metadata (tags, labels)
-        id: meta
+      - name: Extract metadata (tags, labels) for api
+        id: meta-api
         uses: docker/metadata-action@v5
         with:
           images: mardotio/voteflix-api
           tags: |
             type=sha
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-      - name: Build and publish
+      - name: Extract metadata (tags, labels) for migrations
+        id: meta-migrations
+        uses: docker/metadata-action@v5
+        with:
+          images: mardotio/voteflix-api-migrations
+          tags: |
+            type=sha
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+      - name: Build and publish api
         uses: docker/build-push-action@v6
         with:
           push: ${{ contains(fromJson('["push"]'), github.event_name) }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-api.outputs.tags }}
+          labels: ${{ steps.meta-api.outputs.labels }}
           context: services/api
+          target: api
+      - name: Build and publish migrations
+        uses: docker/build-push-action@v6
+        with:
+          push: ${{ contains(fromJson('["push"]'), github.event_name) }}
+          tags: ${{ steps.meta-migrations.outputs.tags }}
+          labels: ${{ steps.meta-migrations.outputs.labels }}
+          context: services/api
+          target: migrations
 
   build-publish-bot:
     name: Build and publish bot
