@@ -15,7 +15,7 @@ const getLoginButton = (jwt: string) =>
     new ButtonBuilder()
       .setStyle(ButtonStyle.Link)
       .setLabel("Login")
-      .setURL(encodeURI(`${BOT_ENVIRONMENT.BOT_UI_URL}/login?token=${jwt}`)),
+      .setURL(encodeURI(`${BOT_ENVIRONMENT.BOT_UI_URL}/login?t=${jwt}`)),
   );
 
 export const login: BotCommand = {
