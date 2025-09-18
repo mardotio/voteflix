@@ -94,10 +94,10 @@ func (c *AppConfig) validateString(envVarName string, validators []validatorFn[s
 func (c *AppConfig) validateEnvironment(envVarName string, validators []validatorFn[string]) string {
 	var value string
 
-	if v := os.Getenv(envVarName); v == "" {
+	if v := os.Getenv(envVarName); v != "" {
 		value = strings.ToLower(v)
 	} else {
-		value = "development"
+		value = "production"
 	}
 
 	var err error

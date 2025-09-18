@@ -19,6 +19,7 @@
   "description": "",
   "dependencies": {
     "@mardotio/generate-environment": "^1.0.1",
+    "date-fns": "^4.1.0",
     "discord-api-types": "^0.38.18",
     "discord.js": "^14.21.0",
     "jsonwebtoken": "^9.0.2",
