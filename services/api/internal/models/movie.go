@@ -18,4 +18,5 @@ type Movie struct {
 	CreatorId    string     `bun:"creator_id,type:uuid,notnull"`
 	WatchedAt    *time.Time `bun:"watched_at,type:timestamp"`
 	Creator      *ListUser  `bun:"rel:belongs-to,join:creator_id=user_id,join:list_id=list_id"`
+	User         *User      `bun:"rel:belongs-to,join:creator_id=id"`
 }

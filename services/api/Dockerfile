@@ -1,4 +1,4 @@
-FROM golang:1.24 AS build
+FROM golang:1.24-alpine AS build
 
 WORKDIR /app
 
@@ -12,13 +12,13 @@ COPY internal internal
 RUN go build cmd/voteflix/main.go
 RUN go build -o ./migrate cmd/voteflix-migrations/main.go
 
-FROM golang:1.24 AS api
+FROM golang:1.24-alpine AS api
 
 WORKDIR /app
 COPY --from=build /app/main ./
 CMD ["./main"]
 
-FROM golang:1.24 AS migrations
+FROM golang:1.24-alpine AS migrations
 
 WORKDIR /app
 COPY --from=build /app/migrate ./

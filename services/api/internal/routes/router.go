@@ -38,7 +38,16 @@ func Router(app *app.App) {
 			if !app.Config().IsProduction() {
 				r.Post("/token", botHandler.CreateToken)
 			}
+
 			r.Post("/list", botHandler.CreateList)
+
+			r.Route("/{serverId}", func(r chi.Router) {
+				r.Use(middleware.ServerCtx(app))
+
+				r.Route("/movies", func(r chi.Router) {
+					r.Get("/pick", botHandler.PickMovie)
+				})
+			})
 		})
 	})
 
