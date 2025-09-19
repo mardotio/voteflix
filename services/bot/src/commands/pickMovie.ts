@@ -37,7 +37,7 @@ export const pickMovie: BotCommand = {
       return;
     }
 
-    const res = await BotApi.pickMovie("586706640309452810");
+    const res = await BotApi.pickMovie(guild.id);
 
     if (isErrorResponse(res)) {
       await interaction.reply("Could not pick a movie at this time");
