@@ -49,9 +49,12 @@ const MoviesLayout = () => {
   return (
     <>
       <div className={styles["list-options"]}>
-        <label htmlFor="stuff" className={styles["status-selector"]}>
+        <label
+          htmlFor="movie-status-selector"
+          className={styles["status-selector"]}
+        >
           <select
-            id="stuff"
+            id="movie-status-selector"
             onChange={(e) => setStatus(e.target.value as MovieStatus | "all")}
           >
             {Object.entries(LABELS).map(([k, v]) => (

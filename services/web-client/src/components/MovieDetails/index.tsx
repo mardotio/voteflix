@@ -15,7 +15,7 @@ import { RatingSlider } from "../RatingSlider";
 import styles from "./MovieDetails.module.scss";
 import { MovieDetailsTimeline } from "./MovieDetailsTimeline";
 
-type View = "details" | "vote" | "reaction";
+type View = "details" | "vote" | "rating";
 
 interface MovieDetailsContentProps {
   movie: GetMovieResponse;
@@ -110,7 +110,7 @@ const MovieDetailsContent = ({
     );
   }
 
-  if (view === "reaction") {
+  if (view === "rating") {
     return (
       <div className={styles["vote-view"]}>
         <h6>What did you think?</h6>
@@ -142,6 +142,8 @@ const MovieDetailsContent = ({
           users={movie.users}
           votes={movie.votes}
           watchedAt={movie.watchedAt}
+          onVoteClick={() => setView("vote")}
+          currentUserId={currentUser.id}
         />
         {movie.status === "approved" && (
           <button
@@ -190,7 +192,15 @@ const MovieDetailsContent = ({
                     )}
                   </p>
                 </div>
-                <p>{r.rating} / 10</p>
+                <p className={styles["rating-value"]}>
+                  {r.userId === currentUser.id ? (
+                    <button onClick={() => setView("rating")}>
+                      {r.rating} / 10
+                    </button>
+                  ) : (
+                    `${r.rating} / 10`
+                  )}
+                </p>
               </li>
             ))}
           </ul>
@@ -221,7 +231,7 @@ export const MovieDetails = ({ movie, onClose }: MovieDetailsProps) => {
     if (movie.status === "pending" && userVote === null) {
       setView("vote");
     } else if (movie.status === "watched" && userRating === null) {
-      setView("reaction");
+      setView("rating");
     } else {
       setView("details");
     }
@@ -230,7 +240,7 @@ export const MovieDetails = ({ movie, onClose }: MovieDetailsProps) => {
   return (
     <Drawer
       height={
-        view === "details" ? undefined : view === "reaction" ? "280px" : "250px"
+        view === "details" ? undefined : view === "rating" ? "280px" : "250px"
       }
       isOpen={movie !== null}
       onClose={onClose}
