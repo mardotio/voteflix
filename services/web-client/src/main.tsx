@@ -9,5 +9,6 @@ import "./syles/base.scss";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />
+    <div id="drawer-root" />
   </StrictMode>,
 );
