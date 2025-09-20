@@ -15,6 +15,8 @@ interface MovieDetailsTimelineProps {
   votes: MovieDetailsVote[];
   users: MovieDetailsUsersMap;
   watchedAt: number | null;
+  currentUserId: string;
+  onVoteClick: () => void;
 }
 
 const toTimestamp = (t: number) => format(new Date(t), "EEE, LLL do yyyy, p");
@@ -64,6 +66,8 @@ export const MovieDetailsTimeline = ({
   votes,
   users,
   watchedAt,
+  currentUserId,
+  onVoteClick,
 }: MovieDetailsTimelineProps) => {
   return (
     <ul className={styles.timeline}>
@@ -83,7 +87,14 @@ export const MovieDetailsTimeline = ({
           <div className={styles.details}>
             <p className={styles.timestamp}>{toTimestamp(v.createdAt)}</p>
             <p className={styles.summary}>
-              {v.isApproval ? "Approved" : "Rejected"} by {users[v.userId].name}
+              {status === "pending" && currentUserId === v.userId ? (
+                <button onClick={onVoteClick}>
+                  {v.isApproval ? "Approved" : "Rejected"} by{" "}
+                  {users[v.userId].name}
+                </button>
+              ) : (
+                `${v.isApproval ? "Approved" : "Rejected"} by ${users[v.userId].name}`
+              )}
             </p>
           </div>
         </li>
