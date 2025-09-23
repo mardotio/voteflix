@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Navigate, createFileRoute, useSearch } from "@tanstack/react-router";
 
 import { useCurrentUserContext } from "../hooks/useCurrentUser";
-import { ApiConfig, authApi, isApiError, usersApi } from "../utils/client";
+import { ApiConfig, authApi, usersApi } from "../utils/client";
 
 interface LoginLayoutSearchParams {
   t?: string;
@@ -11,7 +11,7 @@ interface LoginLayoutSearchParams {
 const LoginLayout = () => {
   const { setCurrentUser } = useCurrentUserContext();
   const { t: token } = useSearch({ from: "/login" });
-  const { data, status, error } = useQuery({
+  const { data } = useQuery({
     queryFn: async () => {
       if (!token && !ApiConfig.hasToken()) {
         throw new Error("No token provided");
@@ -29,29 +29,30 @@ const LoginLayout = () => {
     retry: false,
   });
 
-  if (status === "pending") {
-    return <div>Logging in</div>;
-  }
-
   if (data) {
     return (
       <Navigate to="/$serverId" params={{ serverId: data.list.id }} replace />
     );
   }
 
-  if (!token) {
-    return <div>Please provide token to log in</div>;
-  }
-
-  if (isApiError(error)) {
-    return (
-      <div>
-        <pre>{JSON.stringify(error.body, null, 2)}</pre>
-      </div>
-    );
-  }
-
-  return <div>{error?.message}</div>;
+  return (
+    <div
+      style={{
+        display: "flex",
+        width: "100%",
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+      }}
+    >
+      <img
+        style={{ width: "180px", height: "180px" }}
+        src="/voteflix.svg"
+        alt="Voteflix logo - three circles spread out from top left corner to bottom right corner"
+      />
+    </div>
+  );
 };
 
 export const Route = createFileRoute("/login")({
