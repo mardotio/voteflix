@@ -21,6 +21,7 @@ export interface Movie {
   };
   createdAt: number;
   updatedAt: number | null;
+  watchedAt: number | null;
 }
 
 export interface ListMoviesResponse {

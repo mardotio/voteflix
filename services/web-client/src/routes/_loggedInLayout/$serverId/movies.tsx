@@ -79,6 +79,7 @@ const MoviesLayout = () => {
               key={m.id}
               movie={m}
               onClick={() => setSelectedMovie(m.id)}
+              statusFilter={status}
             />
           )),
         )}
