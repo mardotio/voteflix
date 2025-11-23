@@ -64,10 +64,16 @@ func listMovies(
 
 	cursorOrder := cursor.Order()
 
+	sortColumn := "created_at"
+
+	if queryParams.Status == "watched" {
+		sortColumn = "watched_at"
+	}
+
 	moviesSubQuery := db.NewSelect().
 		Model((*models.Movie)(nil)).
 		Where("list_id = ?", claims.Scope).
-		OrderExpr("? ?", bun.Ident("created_at"), cursorOrder).
+		OrderExpr("? ?", bun.Ident(sortColumn), cursorOrder).
 		OrderExpr("? ?", bun.Ident("id"), cursorOrder).
 		Limit(cursor.FetchLimit())
 
@@ -82,12 +88,12 @@ func listMovies(
 	if !cursor.IsStart() {
 		subQuery := db.NewSelect().
 			Model((*models.Movie)(nil)).
-			Column("created_at").
+			Column(sortColumn).
 			Where("list_id = ?", claims.Scope).
 			Where("id = ?", *cursor.Marker())
 
 		moviesSubQuery.
-			Where("(created_at, id) ? ((?), ?)", cursor.Comparator(), subQuery, *cursor.Marker())
+			Where("(?, id) ? ((?), ?)", bun.Safe(sortColumn), cursor.Comparator(), subQuery, *cursor.Marker())
 	}
 
 	err := db.NewSelect().

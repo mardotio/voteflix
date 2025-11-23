@@ -15,11 +15,13 @@ interface MovieCardProps {
       avatarUrl: string | null;
     };
     createdAt: number;
+    watchedAt: null | number;
   };
+  statusFilter: MovieStatus | "all" | null;
   onClick: () => void;
 }
 
-export const MovieCard = ({ movie, onClick }: MovieCardProps) => {
+export const MovieCard = ({ movie, statusFilter, onClick }: MovieCardProps) => {
   return (
     <li className={styles.movie}>
       <button onClick={onClick}>
@@ -35,7 +37,16 @@ export const MovieCard = ({ movie, onClick }: MovieCardProps) => {
           <p className={styles.status}>{MOVIE_STATUS_LABELS[movie.status]}</p>
         </div>
         <h6 className={styles.name}>{movie.name}</h6>
-        <p className={styles.date}>{format(new Date(movie.createdAt), "P")}</p>
+        <p className={styles.date}>
+          {format(
+            new Date(
+              statusFilter === "watched"
+                ? (movie.watchedAt ?? movie.createdAt)
+                : movie.createdAt,
+            ),
+            "P",
+          )}
+        </p>
       </button>
     </li>
   );

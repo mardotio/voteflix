@@ -52,6 +52,7 @@ const SearchLayout = () => {
               key={m.id}
               movie={m}
               onClick={() => setSelectedMovie(m.id)}
+              statusFilter={null}
             />
           ))}
         </ul>
