@@ -134,6 +134,13 @@ func (j *JsonSender) NotFound(err error) {
 	sendError(j, notFoundError(err.Error()))
 }
 
+type unprocessableEntityError string
+
+func (j *JsonSender) UnprocessableEntity(err error) {
+	j.code = http.StatusUnprocessableEntity
+	sendError(j, unprocessableEntityError(err.Error()))
+}
+
 func (j *JsonSender) Created(res render.Renderer) {
 	j.code = http.StatusCreated
 	send(j, res)

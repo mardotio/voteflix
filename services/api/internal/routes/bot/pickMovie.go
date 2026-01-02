@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/uptrace/bun"
 	"log"
 	"math/rand"
@@ -102,12 +103,33 @@ func findMovie(db *bun.DB, ctx context.Context, list models.List) (models.Movie,
 	return movie, seedUpdateErr
 }
 
+func getHasPendingMovie(db *bun.DB, ctx context.Context, list models.List) (bool, error) {
+	return db.NewSelect().
+		Model((*models.Movie)(nil)).
+		Where("status = 'pending'").
+		Where("list_id = ?", list.Id).
+		Exists(ctx)
+}
+
 func (h *Handler) PickMovie(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	db := h.app.Db()
 	jsonSender := utils.NewJsonSender(w, r)
+	server := middleware.GetServerFromCtx(ctx)
 
-	movie, err := findMovie(db, ctx, middleware.GetServerFromCtx(ctx))
+	hasPendingMovie, hasPendingMovieErr := getHasPendingMovie(db, ctx, server)
+
+	if hasPendingMovieErr != nil {
+		jsonSender.InternalServerError(hasPendingMovieErr)
+		return
+	}
+
+	if hasPendingMovie {
+		jsonSender.UnprocessableEntity(fmt.Errorf("cannot pick movie if there are movies pending in list"))
+		return
+	}
+
+	movie, err := findMovie(db, ctx, server)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		jsonSender.NotFound(err)

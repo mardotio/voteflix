@@ -39,11 +39,22 @@ export const pickMovie: BotCommand = {
 
     const res = await BotApi.pickMovie(guild.id);
 
-    if (isErrorResponse(res)) {
-      await interaction.reply("Could not pick a movie at this time");
+    if (!isErrorResponse(res)) {
+      await interaction.reply({ embeds: [createMovieEmbed(res)] });
       return;
     }
 
-    await interaction.reply({ embeds: [createMovieEmbed(res)] });
+    if (res.status === 422) {
+      const embed = new EmbedBuilder()
+        .setTitle("Pending movies in your list!")
+        .setDescription("Get to work and approve some movies")
+        .setColor("Red")
+        .setImage("https://c.tenor.com/Vyg73kR334sAAAAd/tenor.gif");
+
+      await interaction.reply({ embeds: [embed], flags: ["Ephemeral"] });
+      return;
+    }
+
+    await interaction.reply("Could not pick a movie at this time");
   },
 };
