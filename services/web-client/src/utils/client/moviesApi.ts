@@ -106,6 +106,10 @@ export interface UpdateMovieResponse {
   watchedAt: number | null;
 }
 
+export interface GetMovieStatsResponse extends Record<MovieStatus, number> {
+  total: number;
+}
+
 export const moviesApi = {
   listMovies: (options: ListMoviesRequest) =>
     ApiFetch.fetch<ListMoviesResponse>({
@@ -139,5 +143,10 @@ export const moviesApi = {
       method: "PATCH",
       route: `/api/movies/${movieId}`,
       body,
+    }),
+  getMovieStats: () =>
+    ApiFetch.fetch<GetMovieStatsResponse>({
+      method: "GET",
+      route: "/api/movies/stats",
     }),
 };
