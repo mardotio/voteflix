@@ -46,6 +46,11 @@ const MoviesLayout = () => {
     enabled: selectedMovie !== null,
   });
 
+  const { data: movieStats } = useQuery({
+    queryFn: () => moviesApi.getMovieStats(),
+    queryKey: ["movies"],
+  });
+
   return (
     <>
       <div className={styles["list-options"]}>
@@ -59,7 +64,9 @@ const MoviesLayout = () => {
           >
             {Object.entries(LABELS).map(([k, v]) => (
               <option key={k} value={k}>
-                {v}
+                {movieStats
+                  ? `${v} (${movieStats[k === "all" ? "total" : (k as MovieStatus)]})`
+                  : v}
               </option>
             ))}
           </select>

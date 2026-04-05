@@ -1,14 +1,15 @@
 package routes
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/jwtauth/v5"
 	"voteflix/api/internal/app"
 	"voteflix/api/internal/middleware"
 	"voteflix/api/internal/routes/auth"
 	"voteflix/api/internal/routes/bot"
 	"voteflix/api/internal/routes/movies"
 	"voteflix/api/internal/routes/users"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/jwtauth/v5"
 )
 
 func Router(app *app.App) {
@@ -64,6 +65,7 @@ func Router(app *app.App) {
 		r.Route("/movies", func(r chi.Router) {
 			r.Post("/", moviesHandler.CreateMovie)
 			r.Get("/", moviesHandler.ListMovies)
+			r.Get("/stats", moviesHandler.GetMovieStats)
 
 			r.Route("/{movieId}", func(r chi.Router) {
 				r.Use(middleware.MovieCtx(app))

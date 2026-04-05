@@ -44,6 +44,7 @@ const MovieDetailsContent = ({
       queryClient.invalidateQueries({
         queryKey: ["movie", { id: res.movieId }],
       });
+      queryClient.invalidateQueries({ queryKey: ["movies"] });
       setView("details");
     },
   });
