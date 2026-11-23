@@ -11,7 +11,7 @@ COPY index.html vite.config.ts tsconfig.* ./
 
 RUN npm run build
 
-FROM nginx:1.29
+FROM nginx:1.31
 
 RUN mkdir /etc/certs
 COPY --from=builder /app/dist /code/voteflix/static
